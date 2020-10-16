@@ -155,8 +155,7 @@ def loop():
             veh_standing = False
 
         # publish message
-        if (not veh_standing) or force_joy_publish:
-            pub_joystick.publish(msg)
+        pub_joystick.publish(msg)
 
         # adjust veh_standing such that when vehicle stands still, at least
         # one last publishment was sent to the bot. That's why this adjustment
