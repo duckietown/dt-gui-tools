@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 from PyQt5.QtCore import QSize, pyqtSignal, Qt
 from PyQt5.QtCore import QThread, QTimer
-from PyQt5.QtGui import QImage, QPalette, QBrush, QIcon, QPixmap, QKeyEvent, QTransform
+from PyQt5.QtGui import QImage, QPalette, QBrush, QIcon, QPixmap, QKeyEvent, QTransform, QFocusEvent
 from PyQt5.QtWidgets import QWidget, QApplication, QPushButton, QLabel, QMainWindow, QVBoxLayout
 from pynput.keyboard import Listener
 from duckietown_msgs.msg import BoolStamped
@@ -37,7 +37,8 @@ Keys = {
     KEY_S: KEY_S,
     KEY_I: KEY_I,
     KEY_E: KEY_E,
-    KEY_P: KEY_P
+    KEY_P: KEY_P,
+    'f': 'f'
 }
 
 speed_tang = 1.0
@@ -56,6 +57,7 @@ class ROSManager(QThread):
         self.sub_estop = rospy.Subscriber("~emergency_stop", BoolStamped, self.cbEStop, queue_size=1)
         self.pub_joystick = rospy.Publisher("~joy", Joy, queue_size=1)
         self.pub_int = rospy.Publisher("~intersection_go", BoolStamped, queue_size=1)
+        self.test_pub = rospy.Publisher("~emergency_stop", BoolStamped, queue_size=1)
         self.commands = set()
         self.estop_last_time = time.time()
         self.last_ms = 0
@@ -68,10 +70,9 @@ class ROSManager(QThread):
         Args:
             estop_msg (:obj:`BoolStamped`): the emergency_stop message to process.
         """
-        self.emergency_stop = estop_msg.data
-        if self.emergency_stop:
-            global e_stop
-            e_stop = self.emergency_stop
+        #self.emergency_stop = estop_msg.data
+        global e_stop
+        e_stop = self.emergency_stop = estop_msg.data
 
     def run(self):
         veh_standing = True
@@ -116,10 +117,23 @@ class ROSManager(QThread):
                 msg_int.data = True
                 self.pub_int.publish(msg_int)
 
+            ###
+            def sum_e():
+                rospy.logdebug('TEST')
+                _msg = BoolStamped()
+                if self.emergency_stop:
+                    _msg.data = False
+                else:
+                    _msg.data = True
+                self.test_pub.publish(_msg)
+                    
+
             if KEY_E in self.commands and (time.time() - self.estop_last_time > estop_deadzone_secs):
                 msg.buttons[3] = 1
                 self.estop_last_time = time.time()
                 force_joy_publish = True
+                ####
+                sum_e()
 
             if KEY_Q in self.commands:
                 sys.exit(0)
@@ -133,6 +147,10 @@ class ROSManager(QThread):
 
             if stands:
                 veh_standing = True
+            
+            ####
+            if msg.buttons[3] == 1:
+                sum_e()
 
             sleep(1 / HZ)
 
@@ -190,7 +208,8 @@ class MainWindow(QMainWindow):
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
         self.setWindowTitle(sys.argv[1])
-
+        #self.setFocusPolicy(Qt.StrongFocus)
+        self.in_focus = True
         # ros class
         self.ros = ROSManager(self)
         self.ros.start()
@@ -209,14 +228,21 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.widget)
         self.ros_commands = set()
         self.was_added_new_key = False
+        #self.setFocus()
 
     def ros_wrapper(self, commands):
-        if self.isActiveWindow() and commands:
-            self.ros.action(commands)
+        pass
+        #if self.isActiveWindow() and commands:
+        #    self.ros.action(commands)
 
     def visual_joystick(self, commands):
-        if self.isActiveWindow():
+        
+        focus = QApplication.focusWidget() is not None
+        if self.isActiveWindow() and focus:
             self.widget.light_d_pad(commands)
+            if commands:
+                self.ros.action(commands)
+
 
 
 class Joystick(QWidget):
@@ -231,7 +257,7 @@ class Joystick(QWidget):
         script_path = os.path.dirname(__file__)
         self.script_path = (script_path + "/") if script_path else ""
         self.initUI()
-        self.setFocusPolicy(Qt.StrongFocus)
+        #self.setFocusPolicy(Qt.StrongFocus)
         self.command = set()
         self.timer = QTimer()
         self.timer.timeout.connect(self.timer_fun)
@@ -248,10 +274,10 @@ class Joystick(QWidget):
         self.ros_fun.emit(set())
 
     def initUI(self):
-        label = QLabel(self)
+        self.main_label = QLabel(self)
         self.pixmap = QPixmap(self.script_path + '../images/d-pad.png')
         self.pixmap = self.pixmap.scaled(SCREEN_SIZE, SCREEN_SIZE, Qt.KeepAspectRatio)
-        label.setPixmap(self.pixmap)
+        self.main_label.setPixmap(self.pixmap)
         self.resize(SCREEN_SIZE, SCREEN_SIZE)
         # NOTE: if SCREEN_SIZE changed, need to change funs for buttons
         self.create_up_button()
