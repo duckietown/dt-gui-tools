@@ -22,6 +22,8 @@ class MapViewer(QGraphicsView, QtWidgets.QWidget):
     sc = 1
     rmbPressed = False
     lmbPressed = False
+    drag_mode = False
+    drag_obj = None
     rmbPrevPos = [0, 0]
     mouseStartX, mouseStartY = 0, 0
     mouseCurX, mouseCurY = 0, 0
@@ -62,6 +64,8 @@ class MapViewer(QGraphicsView, QtWidgets.QWidget):
         self.scene().update()
     
     def mouseReleaseEvent(self, event: QtGui.QMouseEvent) -> None:
+        self.drag_mode = False
+        self.drag_obj = None
         if event.button() == QtCore.Qt.LeftButton:
             self.lmbPressed = False
             if int((self.mouseStartX - self.offsetX) / self.sc * self.map.gridSize) == int(
@@ -92,6 +96,14 @@ class MapViewer(QGraphicsView, QtWidgets.QWidget):
 
     def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
         x, y = event.x(), event.y()
+        if event.buttons() == QtCore.Qt.LeftButton:
+            x_map = (x - self.offsetX) / self.sc / self.map.gridSize
+            y_map = (y - self.offsetY) / self.sc / self.map.gridSize
+            drag_obj = self.find_object(x_map, y_map)
+            if  drag_obj:
+                self.drag_obj = drag_obj
+                self.drag_mode = True
+                return
         if event.buttons() == QtCore.Qt.RightButton:
             x_map = (x - self.offsetX) / self.sc / self.map.gridSize
             y_map = (y - self.offsetY) / self.sc / self.map.gridSize
@@ -118,7 +130,14 @@ class MapViewer(QGraphicsView, QtWidgets.QWidget):
                     return object_from_layer 
 
     def mouseMoveEvent(self, event: QtGui.QMouseEvent) -> None:
-        if self.rmbPressed:
+        x_map = (event.x() - self.offsetX) / self.sc / self.map.gridSize
+        y_map = (event.y() - self.offsetY) / self.sc / self.map.gridSize
+        if self.drag_mode:
+            x_map = (event.x() - self.offsetX) / self.sc / self.map.gridSize
+            y_map = (event.y() - self.offsetY) / self.sc / self.map.gridSize
+            self.drag_obj.position = [x_map, y_map]
+            self.scene().update()
+        elif self.rmbPressed:
             self.offsetX += event.x() - self.rmbPrevPos[0]
             self.offsetY += event.y() - self.rmbPrevPos[1]
             self.rmbPrevPos = [event.x(), event.y()]

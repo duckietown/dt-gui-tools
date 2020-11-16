@@ -7,7 +7,8 @@ python3-pygame
 
 # We are using camera-calibration from source
 # to prevent python2 shebang error
-# calibration requirements:
+# NOTE: this should go once camera-calibration is fixed upstream
+# camera-calibration requirements:
 ros-noetic-camera-calibration-parsers
 ros-noetic-camera-info-manager
 libgtk-3-dev

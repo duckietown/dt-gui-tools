@@ -5,3 +5,7 @@ numpy
 PyQt5
 PyYAML==5.3.1
 pynput==1.7.1
+<<<<<<< HEAD
+
+=======
+>>>>>>> 3bc325e1786e89f1219c28e1d867bc8e5ac5e0d1

@@ -1,7 +1,8 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
+
 from PyQt5.QtCore import QSize, pyqtSignal, Qt
 from PyQt5.QtCore import QThread, QTimer
-from PyQt5.QtGui import QImage, QPalette, QBrush, QIcon, QPixmap, QKeyEvent, QTransform, QFocusEvent
+from PyQt5.QtGui import QImage, QPalette, QBrush, QIcon, QPixmap, QKeyEvent, QTransform
 from PyQt5.QtWidgets import QWidget, QApplication, QPushButton, QLabel, QMainWindow, QVBoxLayout
 from pynput.keyboard import Listener
 from duckietown_msgs.msg import BoolStamped
@@ -46,6 +47,7 @@ estop_deadzone_secs = 0.5
 e_stop = False
 commands = set()
 
+
 class ROSManager(QThread):
 
     def __init__(self, parent):
@@ -59,18 +61,19 @@ class ROSManager(QThread):
         self.last_ms = 0
         self.emergency_stop = False
 
-
     def cbEStop(self, estop_msg):
         """
         Callback that process the received :obj:`BoolStamped` messages.
+
         Args:
             estop_msg (:obj:`BoolStamped`): the emergency_stop message to process.
         """
-        global e_stop
-        e_stop = self.emergency_stop = estop_msg.data
+        self.emergency_stop = estop_msg.data
+        if self.emergency_stop:
+            global e_stop
+            e_stop = self.emergency_stop
 
     def run(self):
-        
         veh_standing = True
 
         while True:
@@ -127,9 +130,10 @@ class ROSManager(QThread):
 
             if (not veh_standing) or force_joy_publish:
                 self.pub_joystick.publish(msg)
-            self.commands = set()
+
             if stands:
                 veh_standing = True
+
             sleep(1 / HZ)
 
     def action(self, commands):
@@ -138,8 +142,8 @@ class ROSManager(QThread):
     @staticmethod
     def get_raw_message():
         return Joy(
-        	axes=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-        	buttons=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            axes=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            buttons=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         )
 
 
@@ -182,15 +186,18 @@ class MainWindow(QMainWindow):
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
         self.setWindowTitle(sys.argv[1])
+
         # ros class
         self.ros = ROSManager(self)
         self.ros.start()
         # Key board
         self.key_board_event = MyKeyBoardThread(self)
+        self.key_board_event.add_listener(self.ros_wrapper)
         self.key_board_event.add_listener(self.visual_joystick)
         self.key_board_event.start()
         # UI JOYSTICK
         self.widget = Joystick()
+        self.widget.ros_fun.connect(self.ros_wrapper)
         self.widget.ros_fun.connect(self.visual_joystick)
         self.resize(self.widget.pixmap.width(), self.widget.pixmap.height())
         self.setFixedSize(self.widget.pixmap.width(), self.widget.pixmap.height())
@@ -199,14 +206,13 @@ class MainWindow(QMainWindow):
         self.ros_commands = set()
         self.was_added_new_key = False
 
-    def visual_joystick(self, commands):
-        focus = QApplication.focusWidget() is not None
-        active = self.isActiveWindow()
-        if active and focus:
-            self.widget.light_d_pad(commands)
-            if commands:
-                self.ros.action(commands)
+    def ros_wrapper(self, commands):
+        if self.isActiveWindow() and commands:
+            self.ros.action(commands)
 
+    def visual_joystick(self, commands):
+        if self.isActiveWindow():
+            self.widget.light_d_pad(commands)
 
 
 class Joystick(QWidget):
@@ -221,6 +227,7 @@ class Joystick(QWidget):
         script_path = os.path.dirname(__file__)
         self.script_path = (script_path + "/") if script_path else ""
         self.initUI()
+        self.setFocusPolicy(Qt.StrongFocus)
         self.command = set()
         self.timer = QTimer()
         self.timer.timeout.connect(self.timer_fun)
@@ -237,10 +244,10 @@ class Joystick(QWidget):
         self.ros_fun.emit(set())
 
     def initUI(self):
-        self.main_label = QLabel(self)
+        label = QLabel(self)
         self.pixmap = QPixmap(self.script_path + '../images/d-pad.png')
         self.pixmap = self.pixmap.scaled(SCREEN_SIZE, SCREEN_SIZE, Qt.KeepAspectRatio)
-        self.main_label.setPixmap(self.pixmap)
+        label.setPixmap(self.pixmap)
         self.resize(SCREEN_SIZE, SCREEN_SIZE)
         # NOTE: if SCREEN_SIZE changed, need to change funs for buttons
         self.create_up_button()
@@ -367,8 +374,8 @@ if __name__ == "__main__":
         raise Exception("No hostname specified!")
     else:
         veh_name = sys.argv[1]
+    # ---
     print_hint()
-
     app = QApplication(sys.argv)
     m = MainWindow()
     m.resize(SCREEN_SIZE, SCREEN_SIZE)
@@ -379,3 +386,4 @@ if __name__ == "__main__":
     m.ros.terminate()
     m.ros.wait()
     sys.exit(exit_code)
+
