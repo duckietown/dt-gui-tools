@@ -12,7 +12,6 @@ import rospy
 import time
 import sys
 import os
-import re
 
 HZ = 30
 SCREEN_SIZE = 300
@@ -37,8 +36,7 @@ Keys = {
     KEY_S: KEY_S,
     KEY_I: KEY_I,
     KEY_E: KEY_E,
-    KEY_P: KEY_P,
-    'f': 'f'
+    KEY_P: KEY_P
 }
 
 speed_tang = 1.0
@@ -48,7 +46,6 @@ estop_deadzone_secs = 0.5
 e_stop = False
 commands = set()
 
-
 class ROSManager(QThread):
 
     def __init__(self, parent):
@@ -57,11 +54,11 @@ class ROSManager(QThread):
         self.sub_estop = rospy.Subscriber("~emergency_stop", BoolStamped, self.cbEStop, queue_size=1)
         self.pub_joystick = rospy.Publisher("~joy", Joy, queue_size=1)
         self.pub_int = rospy.Publisher("~intersection_go", BoolStamped, queue_size=1)
-        self.test_pub = rospy.Publisher("~emergency_stop", BoolStamped, queue_size=1)
         self.commands = set()
         self.estop_last_time = time.time()
         self.last_ms = 0
         self.emergency_stop = False
+
 
     def cbEStop(self, estop_msg):
         """
@@ -70,11 +67,11 @@ class ROSManager(QThread):
         Args:
             estop_msg (:obj:`BoolStamped`): the emergency_stop message to process.
         """
-        #self.emergency_stop = estop_msg.data
         global e_stop
         e_stop = self.emergency_stop = estop_msg.data
 
     def run(self):
+        
         veh_standing = True
 
         while True:
@@ -117,23 +114,10 @@ class ROSManager(QThread):
                 msg_int.data = True
                 self.pub_int.publish(msg_int)
 
-            ###
-            def sum_e():
-                rospy.logdebug('TEST')
-                _msg = BoolStamped()
-                if self.emergency_stop:
-                    _msg.data = False
-                else:
-                    _msg.data = True
-                self.test_pub.publish(_msg)
-                    
-
             if KEY_E in self.commands and (time.time() - self.estop_last_time > estop_deadzone_secs):
                 msg.buttons[3] = 1
                 self.estop_last_time = time.time()
                 force_joy_publish = True
-                ####
-                sum_e()
 
             if KEY_Q in self.commands:
                 sys.exit(0)
@@ -144,29 +128,20 @@ class ROSManager(QThread):
 
             if (not veh_standing) or force_joy_publish:
                 self.pub_joystick.publish(msg)
-
+            self.commands = set()
             if stands:
                 veh_standing = True
-            
-            ####
-            if msg.buttons[3] == 1:
-                sum_e()
-
             sleep(1 / HZ)
 
     def action(self, commands):
         self.commands = commands
 
-    def get_raw_message(self):
-        msg = Joy()
-        msg.header.seq = 0
-        msg.header.stamp.secs = 0
-        msg.header.stamp.nsecs = 0
-        msg.header.frame_id = ''
-        msg.axes = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-        msg.buttons = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-
-        return msg
+    @staticmethod
+    def get_raw_message():
+        return Joy(
+        	axes=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+        	buttons=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        )
 
 
 class MyKeyBoardThread(QThread):
@@ -208,19 +183,15 @@ class MainWindow(QMainWindow):
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
         self.setWindowTitle(sys.argv[1])
-        #self.setFocusPolicy(Qt.StrongFocus)
-        self.in_focus = True
         # ros class
         self.ros = ROSManager(self)
         self.ros.start()
         # Key board
         self.key_board_event = MyKeyBoardThread(self)
-        self.key_board_event.add_listener(self.ros_wrapper)
         self.key_board_event.add_listener(self.visual_joystick)
         self.key_board_event.start()
         # UI JOYSTICK
         self.widget = Joystick()
-        self.widget.ros_fun.connect(self.ros_wrapper)
         self.widget.ros_fun.connect(self.visual_joystick)
         self.resize(self.widget.pixmap.width(), self.widget.pixmap.height())
         self.setFixedSize(self.widget.pixmap.width(), self.widget.pixmap.height())
@@ -228,17 +199,11 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.widget)
         self.ros_commands = set()
         self.was_added_new_key = False
-        #self.setFocus()
-
-    def ros_wrapper(self, commands):
-        pass
-        #if self.isActiveWindow() and commands:
-        #    self.ros.action(commands)
 
     def visual_joystick(self, commands):
-        
         focus = QApplication.focusWidget() is not None
-        if self.isActiveWindow() and focus:
+        active = self.isActiveWindow()
+        if active and focus:
             self.widget.light_d_pad(commands)
             if commands:
                 self.ros.action(commands)
@@ -257,7 +222,6 @@ class Joystick(QWidget):
         script_path = os.path.dirname(__file__)
         self.script_path = (script_path + "/") if script_path else ""
         self.initUI()
-        #self.setFocusPolicy(Qt.StrongFocus)
         self.command = set()
         self.timer = QTimer()
         self.timer.timeout.connect(self.timer_fun)
@@ -404,11 +368,8 @@ if __name__ == "__main__":
         raise Exception("No hostname specified!")
     else:
         veh_name = sys.argv[1]
-
-    veh_no = re.sub("\D", "", veh_name)
-    main_letter = veh_name[0]
-
     print_hint()
+
     app = QApplication(sys.argv)
     m = MainWindow()
     m.resize(SCREEN_SIZE, SCREEN_SIZE)
