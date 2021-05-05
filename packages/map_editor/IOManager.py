@@ -20,7 +20,10 @@ def init_map(parent: QtWidgets.QWidget):
 
 def open_map(parent: QtWidgets.QWidget):
     input_map_dir = QFileDialog.getExistingDirectory(parent, 'Open map from directory', '.',  QFileDialog.ShowDirsOnly | QFileDialog.DontResolveSymlinks)
-    if input_map_dir:
+    return input_map_dir
+
+'''
+        if input_map_dir:
         parent.map.name = input_map_dir
         parent.map.layers = []
         for filename, path in get_list_dir_with_path(input_map_dir):
@@ -41,6 +44,7 @@ def open_map(parent: QtWidgets.QWidget):
             else:
                 parent.map.add_objects_to_layer(objects=layer_data, layer_type=layer_type, layer_name=lab_code) 
 
+'''
 
 def get_lab_code(parent): return QtWidgets.QInputDialog.getText(parent, "Lab code", "Enter Lab's code for map:")
 
@@ -48,10 +52,11 @@ def get_lab_code(parent): return QtWidgets.QInputDialog.getText(parent, "Lab cod
 def save_map_as(parent: QtWidgets.QWidget):
     if parent.map.layers:
         output_map_dir = QFileDialog.getExistingDirectory(parent, 'Save map to directory', '.',  QFileDialog.ShowDirsOnly | QFileDialog.DontResolveSymlinks)
-        if output_map_dir:
-            lab_code, ok = get_lab_code(parent)
-            if ok:
-                map_to_yaml(parent.map, output_map_dir, lab_code)
+        return output_map_dir
+        #if output_map_dir:
+        #    lab_code, ok = get_lab_code(parent)
+        #    if ok:
+        #        map_to_yaml(parent.map, output_map_dir, lab_code)
 
 
 def save_map(parent: QtWidgets.QWidget):

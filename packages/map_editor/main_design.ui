@@ -182,6 +182,12 @@
     <addaction name="calc_param"/>
     <addaction name="calc_materials"/>
    </widget>
+   <widget class="QMenu" name="settings">
+    <property name="title">
+     <string>Settings</string>
+    </property>
+    <addaction name="view distortion"/>
+   </widget>
    <widget class="QMenu" name="help">
     <property name="title">
      <string>Help</string>

@@ -1,9 +1,12 @@
 from PyQt5 import QtCore
-from PyQt5.QtWidgets import QWidget, QComboBox, QDialog, QGroupBox, QDialogButtonBox, QFormLayout,QVBoxLayout, QLineEdit, QMessageBox
+from PyQt5.QtWidgets import QWidget, QComboBox, QDialog, QGroupBox, QDialogButtonBox, QFormLayout, QVBoxLayout, \
+    QLineEdit, QMessageBox
 from classes.mapObjects import GroundAprilTagObject
+
 
 class NewTagForm(QDialog):
     apriltag_added = QtCore.pyqtSignal(GroundAprilTagObject)
+
     def __init__(self, tags):
         self.tags = tags
         super().__init__()
@@ -20,8 +23,9 @@ class NewTagForm(QDialog):
             return
 
         if tag_id in self.tags[self.combo_type.currentText()]:
-            self.apriltag_added.emit(GroundAprilTagObject(dict(kind="apriltag",pos=(1.0, 1.0), rotate=0, height=1,
-                                                  optional=False, static=True, tag_type=tag_type, tag_id=tag_id)))
+            self.apriltag_added.emit(GroundAprilTagObject(dict(kind="apriltag", pos=(1.0, 1.0), rotate=0, height=1,
+                                                               optional=False, static=True, tag_type=tag_type,
+                                                               tag_id=tag_id)))
             self.close()
         else:
             msgBox = QMessageBox()
@@ -30,14 +34,14 @@ class NewTagForm(QDialog):
 
     def dialog_reject(self):
         self.close()
-    
+
     def second_combo_box_changed(self, value):
         self.lineEdit.setText(value)
 
     def init_UI(self):
         self.setWindowTitle('New tag')
         buttonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
-        buttonBox.accepted.connect(self.dialog_accept)   
+        buttonBox.accepted.connect(self.dialog_accept)
         buttonBox.rejected.connect(self.dialog_reject)
 
         formGroupBox = QGroupBox("")
@@ -48,7 +52,6 @@ class NewTagForm(QDialog):
         self.combo_type.activated[str].connect(self.change_type)
         layout.addRow(self.combo_type)
 
-        
         self.lineEdit = QLineEdit(self)
         self.lineEdit.setText("0")
 
@@ -61,7 +64,7 @@ class NewTagForm(QDialog):
         formGroupBox.setLayout(layout)
 
         # layout
-        mainLayout = QVBoxLayout() 
+        mainLayout = QVBoxLayout()
         mainLayout.addWidget(formGroupBox)
         mainLayout.addWidget(buttonBox)
         self.setLayout(mainLayout)
@@ -72,4 +75,3 @@ class NewTagForm(QDialog):
     def change_type(self, text):
         self.combo_id.clear()
         self.combo_id.addItems([str(i) for i in self.tags[text]])
-        
