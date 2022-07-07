@@ -6,7 +6,5 @@ configurations:
     network_mode: host
     volumes:
       - /data:/data
-      - /data:/root/data
-      - /code:/root/code
       # avahi socket
       - /var/run/avahi-daemon/socket:/var/run/avahi-daemon/socket
