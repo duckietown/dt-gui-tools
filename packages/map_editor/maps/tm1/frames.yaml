@@ -12,35 +12,8 @@ frames:
     pose:
       pitch: 0.0
       roll: 0.0
-      x: 1.986050420168067
-      y: 1.5485294117647057
-      yaw: 0.0
-      z: 0.0
-    relative_to: ''
-  map_1/citizen2:
-    pose:
-      pitch: 0.0
-      roll: 0.0
-      x: 2.143361344537815
-      y: 0.8799579831932772
-      yaw: 0.0
-      z: 0.0
-    relative_to: ''
-  map_1/ground_tag1:
-    pose:
-      pitch: 0.0
-      roll: 0.0
-      x: 0.8008861360831288
-      y: 2.0047271107119324
-      yaw: 0.0
-      z: 0.0
-    relative_to: ''
-  map_1/object1:
-    pose:
-      pitch: 0.0
-      roll: 0.0
-      x: 1.0
-      y: 1.0
+      x: 1.5042857142857142
+      y: 0.673487394957983
       yaw: 0.0
       z: 0.0
     relative_to: ''
@@ -50,7 +23,7 @@ frames:
       roll: 0.0
       x: 0.0
       y: 0.0
-      yaw: 0.0
+      yaw: 90.0
       z: 0.0
     relative_to: ''
   map_1/tile_0_1:
@@ -59,7 +32,7 @@ frames:
       roll: 0.0
       x: 0.0
       y: 0.585
-      yaw: 0.0
+      yaw: 90.0
       z: 0.0
     relative_to: ''
   map_1/tile_0_2:
@@ -68,7 +41,7 @@ frames:
       roll: 0.0
       x: 0.0
       y: 1.17
-      yaw: 0.0
+      yaw: 90.0
       z: 0.0
     relative_to: ''
   map_1/tile_0_3:
@@ -77,7 +50,7 @@ frames:
       roll: 0.0
       x: 0.0
       y: 1.755
-      yaw: 0.0
+      yaw: 90.0
       z: 0.0
     relative_to: ''
   map_1/tile_0_4:
@@ -86,7 +59,7 @@ frames:
       roll: 0.0
       x: 0.0
       y: 2.34
-      yaw: 0.0
+      yaw: 180.0
       z: 0.0
     relative_to: ''
   map_1/tile_1_0:
@@ -149,7 +122,7 @@ frames:
       roll: 0.0
       x: 1.17
       y: 0.585
-      yaw: 0.0
+      yaw: 90.0
       z: 0.0
     relative_to: ''
   map_1/tile_2_2:
@@ -167,7 +140,7 @@ frames:
       roll: 0.0
       x: 1.17
       y: 1.755
-      yaw: 0.0
+      yaw: 90.0
       z: 0.0
     relative_to: ''
   map_1/tile_2_4:
@@ -176,7 +149,7 @@ frames:
       roll: 0.0
       x: 1.17
       y: 2.34
-      yaw: 0.0
+      yaw: 180.0
       z: 0.0
     relative_to: ''
   map_1/tile_3_0:
@@ -239,7 +212,7 @@ frames:
       roll: 0.0
       x: 2.34
       y: 0.585
-      yaw: 0.0
+      yaw: 90.0
       z: 0.0
     relative_to: ''
   map_1/tile_4_2:
@@ -248,7 +221,7 @@ frames:
       roll: 0.0
       x: 2.34
       y: 1.17
-      yaw: 0.0
+      yaw: 270.0
       z: 0.0
     relative_to: ''
   map_1/tile_4_3:
@@ -257,7 +230,7 @@ frames:
       roll: 0.0
       x: 2.34
       y: 1.755
-      yaw: 0.0
+      yaw: 90.0
       z: 0.0
     relative_to: ''
   map_1/tile_4_4:
@@ -266,60 +239,15 @@ frames:
       roll: 0.0
       x: 2.34
       y: 2.34
-      yaw: 0.0
+      yaw: 270.0
       z: 0.0
     relative_to: ''
   map_1/traffic_sign1:
     pose:
       pitch: 0.0
       roll: 0.0
-      x: 0.20647058823529413
-      y: 2.089285714285714
-      yaw: 0.0
-      z: 0.0
-    relative_to: ''
-  map_1/traffic_sign2:
-    pose:
-      pitch: 0.0
-      roll: 0.0
-      x: 2.556302521008403
-      y: 2.639873949579832
-      yaw: 0.0
-      z: 0.0
-    relative_to: ''
-  map_1/traffic_sign3:
-    pose:
-      pitch: 0.0
-      roll: 0.0
-      x: 0.9700830785017629
-      y: 2.8182444459065046
-      yaw: 0.0
-      z: 0.0
-    relative_to: ''
-  map_1/traffic_sign4:
-    pose:
-      pitch: 0.0
-      roll: 0.0
-      x: 1.4256302521008402
-      y: 1.479705882352941
-      yaw: 0.0
-      z: 0.0
-    relative_to: ''
-  map_1/traffic_sign5:
-    pose:
-      pitch: 0.0
-      roll: 0.0
-      x: 1.43423766151696
-      y: 2.4933362377958663
-      yaw: 0.0
-      z: 0.0
-    relative_to: ''
-  map_1/traffic_sign6:
-    pose:
-      pitch: 0.0
-      roll: 0.0
-      x: 2.928815418825897
-      y: 1.212269588673921
+      x: 1.6812605042016806
+      y: 1.4600420168067225
       yaw: 0.0
       z: 0.0
     relative_to: ''
@@ -327,35 +255,8 @@ frames:
     pose:
       pitch: 0.0
       roll: 0.0
-      x: 2.7037815126050417
-      y: 0.3686974789915969
-      yaw: 0.0
-      z: 0.0
-    relative_to: ''
-  map_1/vehicle2:
-    pose:
-      pitch: 0.0
-      roll: 0.0
-      x: 0.8452724864587744
-      y: 0.2757923290255486
-      yaw: 0.0
-      z: 0.0
-    relative_to: ''
-  map_1/watchtower1:
-    pose:
-      pitch: 0.0
-      roll: 0.0
-      x: 1.0
-      y: 1.0
-      yaw: 0.0
-      z: 0.0
-    relative_to: ''
-  map_1/watchtower2:
-    pose:
-      pitch: 0.0
-      roll: 0.0
-      x: 0.9170205733268464
-      y: 2.2910864493109715
+      x: 0.7472268907563024
+      y: 1.4993697478991597
       yaw: 0.0
       z: 0.0
     relative_to: ''

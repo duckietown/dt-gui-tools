@@ -3,124 +3,124 @@ tiles:
     i: 0
     j: 0
     k: 0
-    type: floor
+    type: curve
   map_1/tile_0_1:
     i: 0
     j: 1
     k: 0
-    type: floor
+    type: straight
   map_1/tile_0_2:
     i: 0
     j: 2
     k: 0
-    type: floor
+    type: 3way
   map_1/tile_0_3:
     i: 0
     j: 3
     k: 0
-    type: floor
+    type: straight
   map_1/tile_0_4:
     i: 0
     j: 4
     k: 0
-    type: floor
+    type: curve
   map_1/tile_1_0:
     i: 1
     j: 0
     k: 0
-    type: floor
+    type: straight
   map_1/tile_1_1:
     i: 1
     j: 1
     k: 0
-    type: floor
+    type: asphalt
   map_1/tile_1_2:
     i: 1
     j: 2
     k: 0
-    type: floor
+    type: straight
   map_1/tile_1_3:
     i: 1
     j: 3
     k: 0
-    type: floor
+    type: asphalt
   map_1/tile_1_4:
     i: 1
     j: 4
     k: 0
-    type: floor
+    type: straight
   map_1/tile_2_0:
     i: 2
     j: 0
     k: 0
-    type: floor
+    type: 3way
   map_1/tile_2_1:
     i: 2
     j: 1
     k: 0
-    type: floor
+    type: straight
   map_1/tile_2_2:
     i: 2
     j: 2
     k: 0
-    type: floor
+    type: 4way
   map_1/tile_2_3:
     i: 2
     j: 3
     k: 0
-    type: floor
+    type: straight
   map_1/tile_2_4:
     i: 2
     j: 4
     k: 0
-    type: floor
+    type: 3way
   map_1/tile_3_0:
     i: 3
     j: 0
     k: 0
-    type: floor
+    type: straight
   map_1/tile_3_1:
     i: 3
     j: 1
     k: 0
-    type: floor
+    type: asphalt
   map_1/tile_3_2:
     i: 3
     j: 2
     k: 0
-    type: floor
+    type: straight
   map_1/tile_3_3:
     i: 3
     j: 3
     k: 0
-    type: floor
+    type: asphalt
   map_1/tile_3_4:
     i: 3
     j: 4
     k: 0
-    type: floor
+    type: straight
   map_1/tile_4_0:
     i: 4
     j: 0
     k: 0
-    type: floor
+    type: curve
   map_1/tile_4_1:
     i: 4
     j: 1
     k: 0
-    type: floor
+    type: straight
   map_1/tile_4_2:
     i: 4
     j: 2
     k: 0
-    type: floor
+    type: 3way
   map_1/tile_4_3:
     i: 4
     j: 3
     k: 0
-    type: floor
+    type: straight
   map_1/tile_4_4:
     i: 4
     j: 4
     k: 0
-    type: floor
+    type: curve

@@ -11,7 +11,7 @@ from classes.Commands.SetTileSizeCommand import SetTileSizeCommand
 from classes.Commands.GetDefaultLayerConf import GetDefaultLayerConf
 from classes.Commands.ChangeObjCommand import ChangeObjCommand
 from classes.Commands.CheckConfigCommand import CheckConfigCommand
-from classes.objects import DraggableImage, ImageObject
+from classes.map_objects import DraggableImage, ImageObject
 from typing import Dict, Any, Optional, Union, Tuple
 from layers import TileLayerHandler, WatchtowersLayerHandler, \
     FramesLayerHandler, TileMapsLayerHandler, CitizensHandler, \
@@ -165,6 +165,7 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
                 self.handlers.handle(ChangeTypeCommand(new_obj.layer_name, object_name, img_name))
         self.change_object_handler(self.scaled_obj, {"scale": self.scale})
 
+
     def add_obj_on_map(self, layer_name: str, object_name: str) -> None:
         self.add_frame_on_map(object_name)
         self.handlers.handle(command=AddObjCommand(layer_name, object_name))
@@ -220,7 +221,6 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
 
     def rotate_obj(self, obj: ImageObject, new_angle: float) -> None:
         obj.rotate_object(new_angle)
-        self.change_object_handler(self.scaled_obj, {"scale": self.scale})
         self.scene_update()
 
     def rotate_obj_on_map(self, frame_name: str, new_angle: float) -> None:
@@ -572,7 +572,7 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
                                       (float(i) * self.tile_width,
                                        float(j) * self.tile_height))
                 self.move_tile(new_tile_name, (i, j))
-        
+
     def open_map(self, path: Path, map_name: str, is_new_map: bool = False,
                  size: Tuple[int, int] = (0, 0),
                  tile_size: Tuple[float, float] = (0, 0)) -> None:
@@ -589,4 +589,3 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
         self.change_object_handler(self.scaled_obj, {"scale": self.scale})
         self.set_map_size()
         self.scene_update()
-

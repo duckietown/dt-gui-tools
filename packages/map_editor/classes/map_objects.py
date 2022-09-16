@@ -38,9 +38,8 @@ class ImageObject(QtWidgets.QLabel):
 
     def set_size_object(self, new_size: tuple) -> None:
         resize = QtCore.QSize(new_size[0], new_size[1])
-        self.pixmap = self.pixmap.scaled(resize,
-                                         transformMode=QtCore.Qt.SmoothTransformation)
-        self.setFixedSize(self.pixmap.width(), self.pixmap.height())
+        self.pixmap = self.pixmap.scaled(resize)
+        self.setFixedSize(new_size[0], new_size[1])
         self.setPixmap(self.pixmap)
         self.show()
 
@@ -126,6 +125,7 @@ class DraggableImage(ImageObject):
             self.change_position((new_pos.x(), new_pos.y()))
             self.move_in_map((new_pos.x(), new_pos.y()))
             self.drag_start_pos = None
+            self.parentWidget().scene_update()
 
 
 if __name__ == '__main__':

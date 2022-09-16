@@ -1,5 +1,5 @@
 from PyQt5 import QtCore
-from PyQt5.QtGui import QIntValidator, QDoubleValidator
+from PyQt5.QtGui import QIntValidator
 from PyQt5.QtWidgets import QDialog, QGroupBox, QDialogButtonBox, QFormLayout, QVBoxLayout, \
     QLineEdit, QLabel
 
@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QDialog, QGroupBox, QDialogButtonBox, QFormLayout, Q
 class NewMapInfoForm(QDialog):
     send_info = QtCore.pyqtSignal(object)
 
-    def __init__(self):
+    def __init__(self, dir: str):
         super(NewMapInfoForm, self).__init__()
         self.setWindowTitle("Info for initialization of map")
         self.formGroupBox = QGroupBox("Init info")
@@ -22,7 +22,7 @@ class NewMapInfoForm(QDialog):
         self.nameTileSizeYEdit = QLineEdit(self)
         self.nameTileSizeYEdit.setText("0.585")
         self.nameDirEdit = QLineEdit(self)
-        self.nameDirEdit.setText("./maps/map1")
+        self.nameDirEdit.setText(f"{dir}/map1")
         self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         self.buttonBox.accepted.connect(self.get_info)
         self.buttonBox.rejected.connect(self.reject)

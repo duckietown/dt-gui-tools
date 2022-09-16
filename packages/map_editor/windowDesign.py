@@ -69,11 +69,15 @@ class Ui_MainWindow(object):
         self.maps = QtWidgets.QMenu(self.menubar)
         self.maps.setObjectName("maps")
         self.help = QtWidgets.QMenu(self.menubar)
-        #self.help.setObjectName("help")
-        #self.settings = QtWidgets.QMenu(self.menubar)
-        #self.settings.setObjectName("settings")
-        #self.utils = QtWidgets.QMenu(self.menubar)
-        #self.utils.setObjectName("utils")
+
+        # TODO future functionality
+        '''
+        self.help.setObjectName("help")
+        self.settings = QtWidgets.QMenu(self.menubar)
+        self.settings.setObjectName("settings")
+        self.utils = QtWidgets.QMenu(self.menubar)
+        self.utils.setObjectName("utils")
+        '''
         self.menuDbl = QtWidgets.QMenu(self.menubar)
         self.menuDbl.setObjectName("menuDbl")
         MainWindow.setMenuBar(self.menubar)
@@ -154,13 +158,16 @@ class Ui_MainWindow(object):
         self.verticalLayout_2.addWidget(self.block_list)
         self.block_widget.setWidget(self.dockWidgetContents)
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(1), self.block_widget)
-        #self.info_widget = QtWidgets.QDockWidget(MainWindow)
-        #sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Preferred)
-        #sizePolicy.setHorizontalStretch(0)
-        #sizePolicy.setVerticalStretch(0)
-        #sizePolicy.setHeightForWidth(self.info_widget.sizePolicy().hasHeightForWidth())
-        #self.info_widget.setSizePolicy(sizePolicy)
-        #self.info_widget.setMinimumSize(QtCore.QSize(175, 250))
+        self.info_widget = QtWidgets.QDockWidget(MainWindow)
+        # TODO future functionality
+        '''
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.info_widget.sizePolicy().hasHeightForWidth())
+        '''
+        self.info_widget.setSizePolicy(sizePolicy)
+        self.info_widget.setMinimumSize(QtCore.QSize(175, 250))
 
         palette = QtGui.QPalette()
         brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
@@ -181,18 +188,19 @@ class Ui_MainWindow(object):
         brush = QtGui.QBrush(QtGui.QColor(211, 215, 207))
         brush.setStyle(QtCore.Qt.SolidPattern)
         palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Window, brush)
-        #self.info_widget.setPalette(palette)
+        self.info_widget.setPalette(palette)
         font = QtGui.QFont()
         font.setPointSize(11)
         font.setItalic(False)
-        '''
+
         self.info_widget.setFont(font)
         self.info_widget.setAcceptDrops(False)
         self.info_widget.setAutoFillBackground(True)
         self.info_widget.setFeatures(QtWidgets.QDockWidget.AllDockWidgetFeatures)
         self.info_widget.setAllowedAreas(QtCore.Qt.LeftDockWidgetArea|QtCore.Qt.RightDockWidgetArea|QtCore.Qt.TopDockWidgetArea)
+
         self.info_widget.setObjectName("info_widget")
-        '''
+
         self.dockWidgetContents_2 = QtWidgets.QWidget()
         self.dockWidgetContents_2.setObjectName("dockWidgetContents_2")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.dockWidgetContents_2)
@@ -201,10 +209,12 @@ class Ui_MainWindow(object):
         self.info_browser.setAutoFillBackground(False)
         self.info_browser.setObjectName("info_browser")
         self.verticalLayout.addWidget(self.info_browser)
-        '''
+
         self.info_widget.setWidget(self.dockWidgetContents_2)
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(2), self.info_widget)
-        
+
+        # TODO future functionality
+        '''
         self.layer_info_widget = QtWidgets.QDockWidget(MainWindow)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
@@ -305,6 +315,8 @@ class Ui_MainWindow(object):
         self.save_map.setObjectName("save_map")
         self.export_png = QtWidgets.QAction(MainWindow)
         self.export_png.setObjectName("export_png")
+
+        # TODO future functionality
         '''
         self.calc_param = QtWidgets.QAction(MainWindow)
         self.calc_param.setEnabled(True)
@@ -351,12 +363,13 @@ class Ui_MainWindow(object):
         self.file.addAction(self.export_png)
         self.file.addSeparator()
         self.file.addAction(self.exit)
-        #self.maps.addAction(self.calc_param)
-        #self.maps.addAction(self.calc_materials)
-        #self.help.addAction(self.about_author)
-        #self.settings.addAction(self.distortion_view)
-        # TODO
+
+        # TODO future functionality
         '''
+        self.maps.addAction(self.calc_param)
+        self.maps.addAction(self.calc_materials)
+        self.help.addAction(self.about_author)
+        self.settings.addAction(self.distortion_view)
         self.utils.addAction(self.region_create)
         self.utils.addAction(self.import_old_format)
         self.utils.addAction(self.env)
@@ -368,10 +381,12 @@ class Ui_MainWindow(object):
         
         self.menubar.addAction(self.menuDbl.menuAction())
         self.menubar.addAction(self.maps.menuAction())
+        
         self.menubar.addAction(self.help.menuAction())
-        #self.menubar.addAction(self.settings.menuAction())
-        #self.menubar.addAction(self.utils.menuAction()) TODO
+        self.menubar.addAction(self.settings.menuAction())
+        self.menubar.addAction(self.utils.menuAction())
         '''
+
         self.menubar.addAction(self.file.menuAction())
 
         self.retranslateUi(MainWindow)
@@ -381,6 +396,8 @@ class Ui_MainWindow(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Map Builder"))
         self.file.setTitle(_translate("MainWindow", "File"))
+
+        # TODO future functionality
         '''
         self.maps.setTitle(_translate("MainWindow", "Map Info"))
         self.help.setTitle(_translate("MainWindow", "Help"))
@@ -390,7 +407,9 @@ class Ui_MainWindow(object):
         '''
         self.tool_bar.setWindowTitle(_translate("MainWindow", "toolBar"))
         self.block_widget.setWindowTitle(_translate("MainWindow", "Maps, traffic_signs, and objects"))
-        #self.info_widget.setWindowTitle(_translate("MainWindow", "Description"))
+        self.info_widget.setWindowTitle(_translate("MainWindow", "Description"))
+
+        # TODO future functionality
         #self.layer_info_widget.setWindowTitle(_translate("MainWindow", "Layers"))
         #self.map_info_widget.setWindowTitle(_translate("MainWindow", "Map editor"))
         self.default_fill_label.setText(_translate("MainWindow", "Default fill"))
@@ -404,22 +423,26 @@ class Ui_MainWindow(object):
         self.save_map.setShortcut(_translate("MainWindow", "Ctrl+S"))
         self.export_png.setText(_translate("MainWindow", "Export to PNG"))
         self.export_png.setShortcut(_translate("MainWindow", "Ctrl+P"))
+        # TODO future functionality
         #self.calc_param.setText(_translate("MainWindow", "Calculate map characteristics"))
         self.save_map_as.setText(_translate("MainWindow", "Save map as"))
         self.save_map_as.setShortcut(_translate("MainWindow", "Ctrl+Alt+S"))
         self.exit.setText(_translate("MainWindow", "Exit"))
         self.exit.setShortcut(_translate("MainWindow", "Ctrl+Q"))
-
+        # TODO future functionality
         #self.change_blocks.setText(_translate("MainWindow", "Blocks"))
         #self.change_info.setText(_translate("MainWindow", "Object description"))
         self.create_new.setText(_translate("MainWindow", "New map"))
         self.create_new.setToolTip(_translate("MainWindow", "Create new map"))
         self.create_new.setShortcut(_translate("MainWindow", "Ctrl+N"))
-        #self.change_map.setText(_translate("MainWindow", "Map Editor"))
-        #self.about_author.setText(_translate("MainWindow", "About"))
-        #self.distortion_view.setText(_translate("MainWindow", "Distortion View"))
-        #self.region_create.setText(_translate("MainWindow", "Create Group"))
-        #self.region_create.setShortcut(_translate("MainWindow", "Ctrl+D"))
-        #self.import_old_format.setText(_translate("MainWindow", "Import map from old format"))
-        #self.change_layer.setText(_translate("MainWindow", "Layers"))
-        #self.env.setText(_translate("MainWindow", "Change environment"))
+        # TODO future functionality
+        '''
+        self.change_map.setText(_translate("MainWindow", "Map Editor"))
+        self.about_author.setText(_translate("MainWindow", "About"))
+        self.distortion_view.setText(_translate("MainWindow", "Distortion View"))
+        self.region_create.setText(_translate("MainWindow", "Create Group"))
+        self.region_create.setShortcut(_translate("MainWindow", "Ctrl+D"))
+        self.import_old_format.setText(_translate("MainWindow", "Import map from old format"))
+        self.change_layer.setText(_translate("MainWindow", "Layers"))
+        self.env.setText(_translate("MainWindow", "Change environment"))
+        '''

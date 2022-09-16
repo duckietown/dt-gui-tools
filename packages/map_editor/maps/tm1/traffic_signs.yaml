@@ -1,9 +1,5 @@
 traffic_signs:
   map_1/traffic_sign1:
     family: 36h11
-    id: 1
+    id: 0
     type: pedestrian
-  map_1/traffic_sign2:
-    family: 36h11
-    id: 1
-    type: stop

@@ -30,14 +30,15 @@ class MapAPI:
     _editor_state: EditorState = None
     _debug_line: DebugLine = None
 
-    def __init__(self, info_json: dict, map_viewer: MapViewer) -> None:
+    def __init__(self, info_json: dict, map_viewer: MapViewer, args) -> None:
         self._map_storage = MapStorage()
-        self._qt_api = QtWindowAPI()
+        self._qt_api = QtWindowAPI(args.wkdir)
         self.info_json = info_json
         self._map_viewer = map_viewer
         self._editor_state = EditorState()
         self.change_obj_info_form = None
-        self.init_info_form = NewMapInfoForm()
+        self.init_info_form = NewMapInfoForm(args.wkdir)
+        self.init_info_form.send_info.connect(self.create_map_triggered)
 
     def open_map_triggered(self, parent: QtWidgets.QWidget) -> None:
         path = self._qt_api.get_dir(parent, "open")
@@ -49,7 +50,6 @@ class MapAPI:
         print('import old format')
 
     def create_map_form(self) -> None:
-        self.init_info_form.send_info.connect(self.create_map_triggered)
         self.init_info_form.show()
         self.set_move_mode(False)
 
@@ -62,8 +62,8 @@ class MapAPI:
                     shutil.rmtree(path)
                 os.makedirs(path)
                 self._map_viewer.create_new_map(info, path)
-            except OSError:
-                logging.error(f"Cannot create path {path} for new map")
+            except OSError as err:
+                logging.error(f"Cannot create path {path} for new map. {err.strerror}")
 
     def create_region(self):
         print('create_region')

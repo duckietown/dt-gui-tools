@@ -32,7 +32,7 @@ class DuckWindow(QtWidgets.QMainWindow):
         self.ui.setupUi(self)
 
         self.map_viewer = MapViewer()
-        self.map_api = MapAPI(self.info_json, self.map_viewer)
+        self.map_api = MapAPI(self.info_json, self.map_viewer, args)
         self.map_viewer.setMinimumSize(540, 540)
         self.ui.horizontalLayout.addWidget(self.map_viewer)
         self.initUi()
@@ -86,8 +86,8 @@ class DuckWindow(QtWidgets.QMainWindow):
         #  Initialize floating blocks
         block_widget = self.ui.block_widget
         # TODO
-        #info_widget = self.ui.info_widget
-        map_info_widget = self.ui.map_info_widget
+        info_widget = self.ui.info_widget
+        #map_info_widget = self.ui.map_info_widget
         #layer_info_widget = self.ui.layer_info_widget
 
         #  Assign actions to buttons
@@ -115,9 +115,11 @@ class DuckWindow(QtWidgets.QMainWindow):
         '''
 
         block_widget.closeEvent = functools.partial(self.blocks_event)
-        #info_widget.closeEvent = functools.partial(self.info_event)
-        map_info_widget.closeEvent = functools.partial(self.map_event)
+        info_widget.closeEvent = functools.partial(self.info_event)
+        #map_info_widget.closeEvent = functools.partial(self.map_event)
         #layer_info_widget.closeEvent = functools.partial(self.close_layer_window_event)
+
+        self.ui.info_browser.setText(self.info_json["description"])
 
         #  QToolBar setting
         tool_bar = self.ui.tool_bar
@@ -232,10 +234,10 @@ class DuckWindow(QtWidgets.QMainWindow):
         set_fill.clicked.connect(self.set_default_fill)
 
     def change_env(self):
-        print('')
+        pass
 
     def center(self):
-        print('')
+        pass
 
     #  Create a new map
     def open_map_triggered(self) -> None:
@@ -249,10 +251,10 @@ class DuckWindow(QtWidgets.QMainWindow):
         self.map_api.create_map_form()
 
     def create_region(self):
-        print('create_region')
+        pass
 
     def change_distortion_view_triggered(self):
-        print('change_distortion_view_triggered')
+        pass
 
     #  Save map
     def save_map_triggered(self):
@@ -264,11 +266,11 @@ class DuckWindow(QtWidgets.QMainWindow):
 
     #  Calculate map characteristics
     def calc_param_triggered(self):
-        print('calc_param_triggered')
+        pass
 
     #  Help: About
     def about_author_triggered(self):
-        print('about_author_triggered')
+        pass
 
     def save_map_as_png(self):
         self.map_api.save_map_as_png(self)
@@ -279,44 +281,44 @@ class DuckWindow(QtWidgets.QMainWindow):
 
     #  Hide Block menu
     def change_blocks_toggled(self):
-        print('change_blocks_toggled')
+        pass
 
     #  Change button state
     def blocks_event(self, event):
-        print('blocks_event')
+        pass
 
     #  Hide information menu
     def change_info_toggled(self):
-        print('change_info_toggled')
+        pass
 
     #  Change button state
     def info_event(self, event):
-        print('info_event')
+        pass
 
     #  Hide the menu about map properties
     def change_map_toggled(self):
-        print('change_map_toggled')
+        pass
 
     #  Change button state
     def map_event(self, event):
-        print('map_event')
+        pass
 
     # Layer window
 
     def toggle_layer_window(self):
-        print('toggle_layer_window')
+        pass
 
     def close_layer_window_event(self, event):
-        print('close_layer_window_event')
+        pass
 
     def layer_tree_clicked(self):
-        print('layer_tree_clicked')
+        pass
 
     def layer_tree_double_clicked(self):
-        print('layer_tree_double_clicked')
+        pass
 
     def update_layer_tree(self):
-        print('update_layer_tree')
+        pass
 
     #  Program exit event
     def quit_program_event(self, event: QEvent) -> None:
@@ -325,7 +327,7 @@ class DuckWindow(QtWidgets.QMainWindow):
 
     #  Handle a click on an item from a list to a list
     def item_list_clicked(self):
-        print('item_list_clicked')
+        pass
 
     #  Double click initiates as single click action
     def item_list_double_clicked(self) -> None:
@@ -336,23 +338,23 @@ class DuckWindow(QtWidgets.QMainWindow):
 
     #  Copy
     def copy_button_clicked(self):
-        print('copy_button_clicked')
+        pass
 
     #  Cut
     def cut_button_clicked(self):
-        print('cut_button_clicked')
+        pass
 
     #  Paste
     def insert_button_clicked(self):
-        print('insert_button_clicked')
+        pass
 
     #  Delete
     def delete_button_clicked(self):
-        print('delete_button_clicked')
+        pass
 
     #  Undo
     def undo_button_clicked(self):
-        print('undo_button_clicked')
+        pass
 
     #  Brush mode
     def brush_mode(self) -> None:
@@ -362,7 +364,7 @@ class DuckWindow(QtWidgets.QMainWindow):
         self.map_api.selection_update(self.ui.default_fill.currentData())
 
     def trimClicked(self):
-        print('trimClicked')
+        pass
 
     def keyPressEvent(self, event: QKeyEvent) -> None:
         self.map_api.key_press_event(event)

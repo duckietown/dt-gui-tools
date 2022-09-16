@@ -644,5 +644,6 @@
             },
             "icon": "img/objects/ground_tags.png"
         }
-    }
+    },
+    "description": "Moving map: Ctrl + Left mouse button"
 }
