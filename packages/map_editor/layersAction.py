@@ -31,7 +31,7 @@ class LayersAction:
 
 
 if __name__ == '__main__':
-    MapStorage(MapDescription(Path("./maps/tm1"), "test"))
+    MapStorage(MapDescription(Path("./maps/tm1"), "map_1"))
     layers_api = LayersAction()
     tiles: MapLayer = layers_api.get_tiles()
     print(type(tiles))

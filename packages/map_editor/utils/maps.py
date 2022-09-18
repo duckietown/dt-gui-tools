@@ -29,7 +29,7 @@ REGISTER = {
 
 
 def default_map_storage() -> MapStorage:
-    return MapStorage(MapDescription(Path("./maps/tm1"), "test"))
+    return MapStorage(MapDescription(Path("./maps/tm1"), "map_1"))
 
 
 def create_layer(dm: Map, layer_name: str, layer: Dict[str, Any]) -> None:

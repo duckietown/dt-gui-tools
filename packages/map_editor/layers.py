@@ -190,7 +190,7 @@ class VehiclesHandler(AbstractHandler, AbstractLayer):
 
 
 if __name__ == '__main__':
-    MapStorage(MapDescription(Path("./maps/tm1"), "test"))
+    MapStorage(MapDescription(Path("./maps/tm1"), "map_1"))
     tile_layer = TileLayerHandler()
     watchtower_layer = WatchtowersLayerHandler()
     tile_layer.set_next(watchtower_layer)

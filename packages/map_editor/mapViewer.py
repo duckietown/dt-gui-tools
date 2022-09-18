@@ -5,6 +5,7 @@ from PyQt5.QtGui import QKeyEvent
 from dt_maps.types.tiles import Tile
 from dt_maps import MapLayer
 from classes.Commands.AddObjCommand import AddObjCommand
+from classes.Commands.AddRelativeToObj import AddRelativeToObj
 from classes.Commands.DeleteObjCommand import DeleteObjCommand
 from classes.Commands.GetLayerCommand import GetLayerCommand
 from classes.Commands.SetTileSizeCommand import SetTileSizeCommand
@@ -169,6 +170,7 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
     def add_obj_on_map(self, layer_name: str, object_name: str) -> None:
         self.add_frame_on_map(object_name)
         self.handlers.handle(command=AddObjCommand(layer_name, object_name))
+        self.handlers.handle(command=AddRelativeToObj(layer_name, object_name))
 
     def add_frame_on_map(self, frame_name: str) -> None:
         self.handlers.handle(command=AddObjCommand(FRAMES, frame_name))
