@@ -645,5 +645,5 @@
             "icon": "img/objects/ground_tags.png"
         }
     },
-    "description": "Moving map: Ctrl + Left mouse button"
+    "description": "Moving map: Ctrl + LMB\n\nEdit object: RMB on object\n\nHighlight area: LMB\n\nMove object: LMB on object and hold\n\nSelect item in right menu: Double click"
 }

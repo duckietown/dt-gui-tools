@@ -8,60 +8,51 @@ frames:
       yaw: 0.0
       z: 0.0
     relative_to: ''
-  map_1/citizen1:
-    pose:
-      pitch: 0.0
-      roll: 0.0
-      x: 1.5042857142857142
-      y: 0.673487394957983
-      yaw: 0.0
-      z: 0.0
-    relative_to: ''
   map_1/tile_0_0:
     pose:
       pitch: 0.0
       roll: 0.0
       x: 0.0
       y: 0.0
-      yaw: 90.0
+      yaw: 0.0
       z: 0.0
-    relative_to: ''
+    relative_to: map_1
   map_1/tile_0_1:
     pose:
       pitch: 0.0
       roll: 0.0
       x: 0.0
       y: 0.585
-      yaw: 90.0
+      yaw: 0.0
       z: 0.0
-    relative_to: ''
+    relative_to: map_1
   map_1/tile_0_2:
     pose:
       pitch: 0.0
       roll: 0.0
       x: 0.0
       y: 1.17
-      yaw: 90.0
+      yaw: 0.0
       z: 0.0
-    relative_to: ''
+    relative_to: map_1
   map_1/tile_0_3:
     pose:
       pitch: 0.0
       roll: 0.0
       x: 0.0
       y: 1.755
-      yaw: 90.0
+      yaw: 0.0
       z: 0.0
-    relative_to: ''
+    relative_to: map_1
   map_1/tile_0_4:
     pose:
       pitch: 0.0
       roll: 0.0
       x: 0.0
       y: 2.34
-      yaw: 180.0
+      yaw: 0.0
       z: 0.0
-    relative_to: ''
+    relative_to: map_1
   map_1/tile_1_0:
     pose:
       pitch: 0.0
@@ -70,7 +61,7 @@ frames:
       y: 0.0
       yaw: 0.0
       z: 0.0
-    relative_to: ''
+    relative_to: map_1
   map_1/tile_1_1:
     pose:
       pitch: 0.0
@@ -79,7 +70,7 @@ frames:
       y: 0.585
       yaw: 0.0
       z: 0.0
-    relative_to: ''
+    relative_to: map_1
   map_1/tile_1_2:
     pose:
       pitch: 0.0
@@ -88,7 +79,7 @@ frames:
       y: 1.17
       yaw: 0.0
       z: 0.0
-    relative_to: ''
+    relative_to: map_1
   map_1/tile_1_3:
     pose:
       pitch: 0.0
@@ -97,7 +88,7 @@ frames:
       y: 1.755
       yaw: 0.0
       z: 0.0
-    relative_to: ''
+    relative_to: map_1
   map_1/tile_1_4:
     pose:
       pitch: 0.0
@@ -106,7 +97,7 @@ frames:
       y: 2.34
       yaw: 0.0
       z: 0.0
-    relative_to: ''
+    relative_to: map_1
   map_1/tile_2_0:
     pose:
       pitch: 0.0
@@ -115,16 +106,16 @@ frames:
       y: 0.0
       yaw: 0.0
       z: 0.0
-    relative_to: ''
+    relative_to: map_1
   map_1/tile_2_1:
     pose:
       pitch: 0.0
       roll: 0.0
       x: 1.17
       y: 0.585
-      yaw: 90.0
+      yaw: 0.0
       z: 0.0
-    relative_to: ''
+    relative_to: map_1
   map_1/tile_2_2:
     pose:
       pitch: 0.0
@@ -133,25 +124,25 @@ frames:
       y: 1.17
       yaw: 0.0
       z: 0.0
-    relative_to: ''
+    relative_to: map_1
   map_1/tile_2_3:
     pose:
       pitch: 0.0
       roll: 0.0
       x: 1.17
       y: 1.755
-      yaw: 90.0
+      yaw: 0.0
       z: 0.0
-    relative_to: ''
+    relative_to: map_1
   map_1/tile_2_4:
     pose:
       pitch: 0.0
       roll: 0.0
       x: 1.17
       y: 2.34
-      yaw: 180.0
+      yaw: 0.0
       z: 0.0
-    relative_to: ''
+    relative_to: map_1
   map_1/tile_3_0:
     pose:
       pitch: 0.0
@@ -160,7 +151,7 @@ frames:
       y: 0.0
       yaw: 0.0
       z: 0.0
-    relative_to: ''
+    relative_to: map_1
   map_1/tile_3_1:
     pose:
       pitch: 0.0
@@ -169,7 +160,7 @@ frames:
       y: 0.585
       yaw: 0.0
       z: 0.0
-    relative_to: ''
+    relative_to: map_1
   map_1/tile_3_2:
     pose:
       pitch: 0.0
@@ -178,7 +169,7 @@ frames:
       y: 1.17
       yaw: 0.0
       z: 0.0
-    relative_to: ''
+    relative_to: map_1
   map_1/tile_3_3:
     pose:
       pitch: 0.0
@@ -187,7 +178,7 @@ frames:
       y: 1.755
       yaw: 0.0
       z: 0.0
-    relative_to: ''
+    relative_to: map_1
   map_1/tile_3_4:
     pose:
       pitch: 0.0
@@ -196,7 +187,7 @@ frames:
       y: 2.34
       yaw: 0.0
       z: 0.0
-    relative_to: ''
+    relative_to: map_1
   map_1/tile_4_0:
     pose:
       pitch: 0.0
@@ -205,58 +196,40 @@ frames:
       y: 0.0
       yaw: 0.0
       z: 0.0
-    relative_to: ''
+    relative_to: map_1
   map_1/tile_4_1:
     pose:
       pitch: 0.0
       roll: 0.0
       x: 2.34
       y: 0.585
-      yaw: 90.0
+      yaw: 0.0
       z: 0.0
-    relative_to: ''
+    relative_to: map_1
   map_1/tile_4_2:
     pose:
       pitch: 0.0
       roll: 0.0
       x: 2.34
       y: 1.17
-      yaw: 270.0
+      yaw: 0.0
       z: 0.0
-    relative_to: ''
+    relative_to: map_1
   map_1/tile_4_3:
     pose:
       pitch: 0.0
       roll: 0.0
       x: 2.34
       y: 1.755
-      yaw: 90.0
+      yaw: 0.0
       z: 0.0
-    relative_to: ''
+    relative_to: map_1
   map_1/tile_4_4:
     pose:
       pitch: 0.0
       roll: 0.0
       x: 2.34
       y: 2.34
-      yaw: 270.0
-      z: 0.0
-    relative_to: ''
-  map_1/traffic_sign1:
-    pose:
-      pitch: 0.0
-      roll: 0.0
-      x: 1.6812605042016806
-      y: 1.4600420168067225
       yaw: 0.0
       z: 0.0
-    relative_to: ''
-  map_1/vehicle1:
-    pose:
-      pitch: 0.0
-      roll: 0.0
-      x: 0.7472268907563024
-      y: 1.4993697478991597
-      yaw: 0.0
-      z: 0.0
-    relative_to: ''
+    relative_to: map_1

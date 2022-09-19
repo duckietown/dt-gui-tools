@@ -6,7 +6,7 @@ from PyQt5.QtGui import QIcon
 
 from mainWindow import DuckWindow
 from argparse import ArgumentParser
-from trash.logger import init_logger
+from utils.logger import init_logger
 from utils.window import get_available_translations
 
 logger = init_logger()

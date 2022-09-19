@@ -20,7 +20,7 @@ class MapStorage(metaclass=SingletonMeta):
 
 
 if __name__ == '__main__':
-    m = MapStorage(MapDescription(Path("./maps/tm1"), "test"))
+    m = MapStorage(MapDescription(Path("./maps/tm1"), "map_1"))
     print(m.map.name)
     n = MapStorage()
     print(n.map.name)

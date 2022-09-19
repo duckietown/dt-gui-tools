@@ -7,7 +7,7 @@ from forms.quit import quit_message_box
 from forms.default_forms import form_yes
 from forms.start_info import NewMapInfoForm
 from forms.edit_object import EditObject
-from utils.maps import change_map_directory
+from utils.maps import change_map_directory, change_map_name
 from utils.qtWindowAPI import QtWindowAPI
 from mapStorage import MapStorage
 from mapViewer import MapViewer

@@ -1,5 +1,6 @@
 from dt_maps import Map, MapLayer
 from classes.basic.command import Command
+from utils.constants import FRAMES
 
 
 class RotateCommand(Command):
@@ -10,6 +11,7 @@ class RotateCommand(Command):
         self._frame_name = frame_name
         self._new_angle = new_angle
 
-    def execute(self, dm: Map, layer: MapLayer, layer_name: str, *args, **kwargs) -> None:
-        if layer_name == "frames":
-            dm.layers[layer_name][self._frame_name].pose.yaw = float(self._new_angle)
+    def execute(self, dm: Map, layer: MapLayer, layer_name: str, *args,
+                **kwargs) -> None:
+        if layer_name == FRAMES:
+            layer[self._frame_name].pose.yaw = float(self._new_angle)

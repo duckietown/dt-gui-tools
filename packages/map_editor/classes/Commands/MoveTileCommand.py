@@ -1,5 +1,6 @@
 from dt_maps import Map, MapLayer
 from classes.basic.command import Command
+from utils.constants import TILES
 
 
 class MoveTileCommand(Command):
@@ -10,7 +11,8 @@ class MoveTileCommand(Command):
         self._tile_name = tile_name
         self._new_position = new_position
 
-    def execute(self, dm: Map, layer: MapLayer, layer_name: str, *args, **kwargs) -> None:
-        if layer_name == "tiles":
-            dm.layers[layer_name][self._tile_name].i = self._new_position[0]
-            dm.layers[layer_name][self._tile_name].j = self._new_position[1]
+    def execute(self, dm: Map, layer: MapLayer, layer_name: str, *args,
+                **kwargs) -> None:
+        if layer_name == TILES:
+            layer[self._tile_name].i = self._new_position[0]
+            layer[self._tile_name].j = self._new_position[1]

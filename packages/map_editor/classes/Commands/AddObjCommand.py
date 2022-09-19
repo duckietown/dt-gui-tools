@@ -11,6 +11,7 @@ class AddObjCommand(Command):
         self._layer_name = layer_name
         self._object_name = object_name
 
-    def execute(self, dm: Map, layer: MapLayer, layer_name: str, default_conf: dict, *args, **kwargs) -> None:
+    def execute(self, dm: Map, layer: MapLayer, layer_name: str,
+                default_conf: dict, *args, **kwargs) -> None:
         if layer_name == self._layer_name:
             set_obj(layer, self._object_name, default_conf)

@@ -11,6 +11,7 @@ class ChangeTypeCommand(Command):
         self._new_type = new_type
         self._layer_name = layer_name
 
-    def execute(self, dm: Map, layer: MapLayer, layer_name: str, *args, **kwargs) -> None:
+    def execute(self, dm: Map, layer: MapLayer, layer_name: str, *args,
+                **kwargs) -> None:
         if layer_name == self._layer_name:
-            dm.layers[layer_name][self._name].type = self._new_type
+            layer[self._name].type = self._new_type

@@ -5,6 +5,7 @@ from PyQt5.QtGui import QKeyEvent
 from dt_maps.types.tiles import Tile
 from dt_maps import MapLayer
 from classes.Commands.AddObjCommand import AddObjCommand
+from classes.Commands.AddRelativeToObj import AddRelativeToObj
 from classes.Commands.DeleteObjCommand import DeleteObjCommand
 from classes.Commands.GetLayerCommand import GetLayerCommand
 from classes.Commands.SetTileSizeCommand import SetTileSizeCommand
@@ -23,10 +24,10 @@ from classes.Commands.RotateObjCommand import RotateCommand
 from classes.Commands.ChangeTypeCommand import ChangeTypeCommand
 from classes.Commands.MoveTileCommand import MoveTileCommand
 from utils.maps import default_map_storage, get_map_height, get_map_width, \
-    REGISTER
+    REGISTER, change_map_name
 from utils.constants import LAYERS_WITH_TYPES, OBJECTS_TYPES, FRAMES, FRAME, \
     TILES, \
-    TILE_MAPS, TILE_SIZE, NOT_DRAGGABLE
+    TILE_MAPS, TILE_SIZE, NOT_DRAGGABLE, LAYER_NAME, NEW_CONFIG
 from classes.MapDescription import MapDescription
 from pathlib import Path
 
@@ -38,7 +39,6 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
     map_height = 10
     objects = {}
     handlers = None
-
     scale = 1
     tile_selection = [0] * 4
     rmbPressed = False
@@ -120,6 +120,10 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
         tile_maps = self.get_layer(TILE_MAPS)
         self.tile_map = [elem for elem in tile_maps][0]
 
+    def set_relative_to(self, object_name: str, value: str):
+        self.handlers.handle(
+            command=AddRelativeToObj(object_name, value))
+
     def add_obj(self, type_of_element: str, item_name: str = None) -> None:
         i = 1
         layer_name = f"{type_of_element}s"
@@ -127,6 +131,7 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
             object_name: str = f"{self.tile_map}/{type_of_element}{i}"
             if object_name not in self.objects:
                 self.add_obj_on_map(layer_name, object_name)
+                self.set_relative_to(object_name, self.map.map.name)
                 self.add_obj_image(layer_name, object_name, item_name=item_name)
                 self.scaled_obj(self.get_object(object_name),
                                 {'scale': self.scale})
@@ -164,7 +169,6 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
             if new_obj.layer_name in LAYERS_WITH_TYPES:
                 self.handlers.handle(ChangeTypeCommand(new_obj.layer_name, object_name, img_name))
         self.change_object_handler(self.scaled_obj, {"scale": self.scale})
-
 
     def add_obj_on_map(self, layer_name: str, object_name: str) -> None:
         self.add_frame_on_map(object_name)
@@ -339,15 +343,15 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
                     self.parentWidget().parent().view_info_form("Error",
                                                                 "Invalid object frame values entered!")
                 # check correct values
-                if self.check_layer_config(conf["layer_name"], conf["new_config"]):
-                    self.change_obj_from_config(conf["layer_name"],
+                if self.check_layer_config(conf[LAYER_NAME], conf[NEW_CONFIG]):
+                    self.change_obj_from_config(conf[LAYER_NAME],
                                                 conf["name"],
-                                                conf["new_config"])
+                                                conf[NEW_CONFIG])
                     name = obj.name
                     self.objects.__delitem__(obj.name)
                     obj.delete_object()
-                    layer = self.get_layer(conf["layer_name"])
-                    self.add_obj_image(conf["layer_name"], name, layer[name])
+                    layer = self.get_layer(conf[LAYER_NAME])
+                    self.add_obj_image(conf[LAYER_NAME], name, layer[name])
                 else:
                     self.parentWidget().parent().view_info_form("Error",
                                                                 "Invalid object configuration entered!")
@@ -538,6 +542,8 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
         width, height = int(info['x']), int(info['y'])
         tile_width = float(info['tile_width'])
         tile_height = float(info['tile_height'])
+        self.tile_map = info["map_name"]
+        change_map_name(self.map.map, info["map_name"])
         self.grid_width = tile_width * self.grid_scale
         self.grid_height = tile_height * self.grid_scale
         self.scale = 1
@@ -560,7 +566,6 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
                                    tile_size: Tuple[float, float]) -> None:
         width, height = size
         self.set_map_viewer_sizes(tile_size[0], tile_size[1])
-        self.tile_map = "map_1"
         self.add_frame_on_map(self.tile_map)
         self.add_obj_on_map(TILE_MAPS, self.tile_map)
         self.set_tile_size_command(self.tile_map, tile_size)
@@ -568,6 +573,7 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
             for j in range(height):
                 new_tile_name = f"{self.tile_map}/tile_{i}_{j}"
                 self.add_obj_on_map(TILES, new_tile_name)
+                self.set_relative_to(new_tile_name, self.map.map.name)
                 self.move_obj_command(new_tile_name,
                                       (float(i) * self.tile_width,
                                        float(j) * self.tile_height))

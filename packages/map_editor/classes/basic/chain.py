@@ -1,6 +1,6 @@
 from __future__ import annotations
 from abc import abstractmethod, ABC
-from typing import Optional, Any
+from typing import Any
 
 from classes.basic.command import Command
 

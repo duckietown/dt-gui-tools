@@ -29,7 +29,7 @@ REGISTER = {
 
 
 def default_map_storage() -> MapStorage:
-    return MapStorage(MapDescription(Path("./maps/tm1"), "test"))
+    return MapStorage(MapDescription(Path("./maps/tm1"), "map_1"))
 
 
 def create_layer(dm: Map, layer_name: str, layer: Dict[str, Any]) -> None:
@@ -51,6 +51,10 @@ def delete_obj(layer: MapLayer, obj_name: str) -> None:
 def change_map_directory(dm: Map, new_dir: str) -> None:
     dm._path = new_dir
     dm._assets_dir = os.path.join(dm._path, "assets")
+
+
+def change_map_name(dm: Map, new_name: str) -> None:
+    dm._name = new_name
 
 
 def get_map_height(tiles: Dict[str, Any]) -> int:

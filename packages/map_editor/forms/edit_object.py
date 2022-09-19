@@ -44,7 +44,11 @@ class EditObject(QDialog):
         try:
             #TODO
             for frame_key in self.info_send["frame"]:
-                for frame_val in self.info_send["frame"][frame_key]:
+                if frame_key == "relative_to":
+                    list_for_edit = [frame_key]
+                else:
+                    list_for_edit = self.info_send["frame"][frame_key]
+                for frame_val in list_for_edit:
                     if isinstance(self.info_send["frame"][frame_key], dict):
                         row_name = f"{frame_key}.{frame_val}"
                         self.info_send["frame"][frame_key][frame_val] = \
@@ -72,7 +76,11 @@ class EditObject(QDialog):
         layout.addWidget(QHLine())
         # TODO
         for frame_key in frame:
-            for frame_val in frame[frame_key]:
+            if frame_key == "relative_to":
+                list_for_edit = [frame_key]
+            else:
+                list_for_edit = frame[frame_key]
+            for frame_val in list_for_edit:
                 edit = QLineEdit(self)
                 if not isinstance(frame[frame_key], dict):
                     row_name = frame_key
