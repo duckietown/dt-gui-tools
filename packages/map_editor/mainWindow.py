@@ -5,6 +5,7 @@ from PyQt5.QtGui import QResizeEvent, QKeyEvent
 from mapAPI import MapAPI
 from mapViewer import MapViewer
 from utils.debug import DebugLine
+from utils.maps import copy_dir_with_map
 from windowDesign import *
 from PyQt5.QtCore import Qt, QEvent
 from typing import Dict, Any
@@ -30,12 +31,13 @@ class DuckWindow(QtWidgets.QMainWindow):
 
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-
-        self.map_viewer = MapViewer()
-        self.map_api = MapAPI(self.info_json, self.map_viewer, args)
+        # necessary in docker (otherwise Permission denied error for saving map)
+        self.copy_dir_with_map("./maps/tm1", f"{args.wkdir}/map1")
+        self.map_viewer = MapViewer(args.wkdir)
         self.map_viewer.setMinimumSize(540, 540)
         self.ui.horizontalLayout.addWidget(self.map_viewer)
-        self.initUi()
+        self.map_api = MapAPI(self.info_json, self.map_viewer, args)
+        self.init_ui()
 
         if args.debug:
             self.debug_line = DebugLine()
@@ -43,8 +45,6 @@ class DuckWindow(QtWidgets.QMainWindow):
             self.debug_line.setMaximumHeight(20)
             self.ui.horizontalLayout.addWidget(self.debug_line, Qt.AlignBottom)
             self.map_api.set_debug_mode(self.debug_line)
-
-        self.update_layer_tree()
 
     def get_translation(self, elem):
         """Gets info about the element based on self.locale
@@ -57,10 +57,10 @@ class DuckWindow(QtWidgets.QMainWindow):
         if self.locale in elem['lang']:
             return elem['lang'][self.locale]
         else:
-            #logger.debug("duck_window.get_translation. No such locale: {}".format(self.locale))
+            # logger.debug("duck_window.get_translation. No such locale: {}".format(self.locale))
             return elem['lang']['en']
 
-    def initUi(self):
+    def init_ui(self):
         self.center()
         self.show()
 
@@ -74,14 +74,16 @@ class DuckWindow(QtWidgets.QMainWindow):
         #calc_param = self.ui.calc_param
         #about_author = self.ui.about_author
         exit = self.ui.exit
+        # TODO
+        '''     
         change_blocks = self.ui.change_blocks
-        #change_info = self.ui.change_info TODO
+        change_info = self.ui.change_info TODO
         change_map = self.ui.change_map
-        #change_layer = self.ui.change_layer TODO
-        #distortion_view = self.ui.distortion_view
-        #create_region = self.ui.region_create
-        #import_old_format = self.ui.import_old_format
-        #environment = self.ui.env
+        change_layer = self.ui.change_layer TODO
+        distortion_view = self.ui.distortion_view
+        create_region = self.ui.region_create
+        import_old_format = self.ui.import_old_format
+        environment = self.ui.env'''
 
         #  Initialize floating blocks
         block_widget = self.ui.block_widget
@@ -317,9 +319,6 @@ class DuckWindow(QtWidgets.QMainWindow):
     def layer_tree_double_clicked(self):
         pass
 
-    def update_layer_tree(self):
-        pass
-
     #  Program exit event
     def quit_program_event(self, event: QEvent) -> None:
         self.exit_triggered()
@@ -396,3 +395,6 @@ class DuckWindow(QtWidgets.QMainWindow):
 
     def view_info_form(self, header: str, info: str) -> None:
         self.map_api.view_info_form(header, info)
+
+    def copy_dir_with_map(self, path_from: str, path_to: str) -> None:
+        copy_dir_with_map(path_from, path_to)

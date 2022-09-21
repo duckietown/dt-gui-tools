@@ -1,4 +1,5 @@
 import os
+import shutil
 from pathlib import Path
 
 from dt_maps.types.tile_maps import TileSize
@@ -28,8 +29,13 @@ REGISTER = {
 }
 
 
-def default_map_storage() -> MapStorage:
-    return MapStorage(MapDescription(Path("./maps/tm1"), "map_1"))
+def copy_dir_with_map(path_from: str, path_to: str) -> None:
+    if not os.path.exists(path_to):
+        shutil.copytree(path_from, path_to)
+
+
+def default_map_storage(map_dir: str) -> MapStorage:
+    return MapStorage(MapDescription(Path(map_dir), "map_1"))
 
 
 def create_layer(dm: Map, layer_name: str, layer: Dict[str, Any]) -> None:

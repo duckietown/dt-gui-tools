@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QDialog, QGroupBox, QDialogButtonBox, QFormLayout, Q
 class NewMapInfoForm(QDialog):
     send_info = QtCore.pyqtSignal(object)
 
-    def __init__(self, dir: str):
+    def __init__(self, map_dir: str):
         super(NewMapInfoForm, self).__init__()
         self.setWindowTitle("Info for initialization of map")
         self.formGroupBox = QGroupBox("Init info")
@@ -24,7 +24,7 @@ class NewMapInfoForm(QDialog):
         self.nameMap = QLineEdit(self)
         self.nameMap.setText("map_1")
         self.nameDirEdit = QLineEdit(self)
-        self.nameDirEdit.setText(f"{dir}/map1")
+        self.nameDirEdit.setText(f"{map_dir}/map1")
         self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         self.buttonBox.accepted.connect(self.get_info)
         self.buttonBox.rejected.connect(self.reject)

@@ -57,11 +57,11 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
     grid_width: float = tile_width * grid_scale
     tile_map: str = "map_1"
 
-    def __init__(self):
+    def __init__(self, work_dir: str):
         QtWidgets.QGraphicsView.__init__(self)
-
         self.setScene(QtWidgets.QGraphicsScene())
-        self.map = default_map_storage()
+        # load default map
+        self.map = default_map_storage(f"{work_dir}/map1")
         self.init_handlers()
         self.set_map_viewer_sizes()
         self.coordinates_transformer = CoordinatesTransformer(self.scale,
@@ -548,7 +548,7 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
         self.grid_height = tile_height * self.grid_scale
         self.scale = 1
         self.coordinates_transformer.set_scale(self.scale)
-        self.open_map(path, self.map.map.name, True, (width, height),
+        self.open_map(path, info["map_name"], True, (width, height),
                       (tile_width, tile_height))
         self.set_coordinates_transformer_data()
 
