@@ -19,7 +19,7 @@ ARG LAUNCHER=default
 
 # define base image
 ARG DOCKER_REGISTRY=docker.io
-FROM ${DOCKER_REGISTRY}/duckietown/${BASE_IMAGE}:${BASE_TAG} as BASE
+FROM ${DOCKER_REGISTRY}/duckietown/${BASE_IMAGE}:${BASE_TAG} as base
 
 # recall all arguments
 ARG ARCH
@@ -155,7 +155,7 @@ RUN sed -i 's#app/locale/#novnc/app/locale/#' /src/web/dist/static/novnc/app/ui.
 
 
 # jump back to the base image and copy frontend from builder stage
-FROM BASE
+FROM base
 COPY --from=builder /src/web/dist/ /usr/local/lib/web/frontend/
 
 # make websockify executable
