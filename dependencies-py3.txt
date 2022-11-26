@@ -6,8 +6,10 @@ duckietown-world-daffy
 
 # Map editor
 PyQt5
-PyYAML==5.3.1
-pynput==1.7.1
+PyYAML
+pynput
+# PyYAML==5.3.1
+# pynput==1.7.1
 
 # Jupyter notebook
 jupyterlab
