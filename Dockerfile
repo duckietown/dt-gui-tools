@@ -1,7 +1,7 @@
 # parameters
 ARG REPO_NAME="dt-gui-tools"
 ARG DESCRIPTION="Provides access to GUI-based tools (e.g., rviz, rqt_image_view)"
-ARG MAINTAINER="Andrea F. Daniele (afdaniele@ttic.edu)"
+ARG MAINTAINER="Andrea F. Daniele (afdaniele@duckietown.com)"
 # pick an icon from: https://fontawesome.com/v4.7.0/icons/
 ARG ICON="desktop"
 
