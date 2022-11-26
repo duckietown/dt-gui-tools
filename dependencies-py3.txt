@@ -1,8 +1,7 @@
 # LIST YOUR PYTHON3 PACKAGES HERE
-numpy
+# NOTE: only place non-Duckietown libraries here; pin versions only if necessary
 
-# Duckietown World
-duckietown-world-daffy
+numpy
 
 # Map editor
 PyQt5
