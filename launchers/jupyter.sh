@@ -47,6 +47,14 @@ if [ $? -ne 0 ]; then
     echo "WARNING: The path '${JUPYTER_WS}' is not a VOLUME. All the changes will be deleted with the container."
 fi
 
+# Start Xvfbs
+echo "$prefix Starting xvfb"
+Xvfb :99 -screen 0 1024x768x24 -ac +extension GLX +render -noreset &
+xvfb=$!
+echo "$prefix Started xvfb with PID $xvfb" 1>&2
+export DISPLAY=:99
+sleep 2
+
 # run jupyter
 dt-exec ${JUPYTER_CMD}
 
@@ -56,3 +64,4 @@ dt-exec ${JUPYTER_CMD}
 
 # wait for app to end
 dt-launchfile-join
+kill $xvfb
