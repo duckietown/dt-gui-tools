@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="veh" doc="name of the vehicle"/>
+    <arg name="pkg_name" value="led_widget"/>
+    <arg name="node_name" default="led_widget"/>
+
+    <group ns="$(arg veh)">
+        <remap from="$(arg node_name)/led_emitter_node/led_pattern" to="led_pattern" />
+        <node pkg="$(arg pkg_name)" type="$(arg node_name)_gui.py" name="$(arg node_name)" output="screen" args="$(arg veh)" />
+    </group>
+</launch>
