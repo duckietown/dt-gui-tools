@@ -1,7 +1,7 @@
 # parameters
 ARG REPO_NAME="dt-gui-tools"
 ARG DESCRIPTION="Provides access to GUI-based tools (e.g., rviz, rqt_image_view)"
-ARG MAINTAINER="Andrea F. Daniele (afdaniele@ttic.edu)"
+ARG MAINTAINER="Andrea F. Daniele (afdaniele@duckietown.com)"
 # pick an icon from: https://fontawesome.com/v4.7.0/icons/
 ARG ICON="desktop"
 
@@ -19,7 +19,7 @@ ARG LAUNCHER=default
 
 # define base image
 ARG DOCKER_REGISTRY=docker.io
-FROM ${DOCKER_REGISTRY}/duckietown/${BASE_IMAGE}:${BASE_TAG} as BASE
+FROM ${DOCKER_REGISTRY}/duckietown/${BASE_IMAGE}:${BASE_TAG} as base
 
 # recall all arguments
 ARG ARCH
@@ -56,12 +56,11 @@ COPY ./dependencies-apt.txt "${REPO_PATH}/"
 RUN dt-apt-install ${REPO_PATH}/dependencies-apt.txt
 
 # install python3 dependencies
-ARG PIP_INDEX_URL="https://pypi.org/simple"
+ARG PIP_INDEX_URL="https://pypi.org/simple/"
 ENV PIP_INDEX_URL=${PIP_INDEX_URL}
-RUN echo PIP_INDEX_URL=${PIP_INDEX_URL}
 
 COPY ./dependencies-py3.* "${REPO_PATH}/"
-RUN python3 -m pip install  -r ${REPO_PATH}/dependencies-py3.txt
+RUN dt-pip3-install "${REPO_PATH}/dependencies-py3.*"
 
 # copy the source code
 COPY ./packages "${REPO_PATH}/packages"
@@ -155,7 +154,7 @@ RUN sed -i 's#app/locale/#novnc/app/locale/#' /src/web/dist/static/novnc/app/ui.
 
 
 # jump back to the base image and copy frontend from builder stage
-FROM BASE
+FROM base
 COPY --from=builder /src/web/dist/ /usr/local/lib/web/frontend/
 
 # make websockify executable
