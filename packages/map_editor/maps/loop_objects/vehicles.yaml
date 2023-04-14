@@ -1,0 +1,5 @@
+vehicles:
+  map_1/vehicle1:
+    color: blue
+    configuration: DB18
+    id: ''

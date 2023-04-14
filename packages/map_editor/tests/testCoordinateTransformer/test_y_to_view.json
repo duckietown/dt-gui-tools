@@ -1,0 +1,42 @@
+{
+    "test_y_to_1": {
+        "y": 0,
+        "ret": 0,
+        "scale": 1.0,
+        "size_map": 7,
+        "grid_width": 58.5,
+        "grid_height": 58.5,
+        "tile_height": 0.585,
+        "tile_width": 0.585
+    },
+    "test_y_to_2": {
+        "y": 1,
+        "ret": 101.7094,
+        "scale": 1.0,
+        "size_map": 7,
+        "grid_width": 58.5,
+        "grid_height": 58.5,
+        "tile_height": 0.585,
+        "tile_width": 0.585
+    },
+    "test_y_to_3": {
+        "y": 10,
+        "ret": 508.547,
+        "scale": 0.5,
+        "size_map": 6,
+        "grid_width": 58.5,
+        "grid_height": 58.5,
+        "tile_height": 0.585,
+        "tile_width": 0.585
+    },
+    "test_y_to_4": {
+        "y": 1,
+        "ret": 203.4188,
+        "scale": 2.0,
+        "size_map": 7,
+        "grid_width": 58.5,
+        "grid_height": 58.5,
+        "tile_height": 0.585,
+        "tile_width": 0.585
+    }
+}

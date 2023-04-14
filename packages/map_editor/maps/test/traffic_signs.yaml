@@ -1,0 +1,9 @@
+traffic_signs:
+  map_1/traffic_sign1:
+    family: 36h11
+    id: 0
+    type: no_left_turn
+  map_1/traffic_sign2:
+    family: 36h11
+    id: 0
+    type: do_not_enter

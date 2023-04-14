@@ -2,10 +2,11 @@
 import sys
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import QTranslator
-from mainwindow import duck_window
+from PyQt5.QtGui import QIcon
+from mainWindow import DuckWindow
 from argparse import ArgumentParser
-from logger import init_logger
-from utils import get_available_translations
+from utils.logger import init_logger
+from utils.window import get_available_translations
 
 logger = init_logger()
 
@@ -18,14 +19,17 @@ def init_translator(app, path):
     app.installTranslator(translator)
 
 
-def main(app_args):
+def main(args):
     app = QtWidgets.QApplication(sys.argv)
+    app.setWindowIcon(QIcon("./img/icons/duckie.ico"))
 
     # Install translator
     init_translator(app, args.locale_path)
 
     # Create main window
-    window = duck_window(args)
+    window = DuckWindow(args)
+    window.map_viewer.save_viewer_state()
+    window.to_the_map_corner()
 
     window.show()
     app.exec_()
@@ -34,8 +38,9 @@ def main(app_args):
 if __name__ == '__main__':
     available_locales = get_available_translations(LANG_DIR)
     parser = ArgumentParser()
-    parser.add_argument('-d', '--debug', action="store_true", help="Debug mode")
+    parser.add_argument('-d', '--debug', action="store_true", default=True,  help="Debug mode")
     parser.add_argument('-l', '--locale', choices=available_locales, default='en', help="App locale")
+    parser.add_argument('-w', '--wkdir', default=".", help="Current dir for display")
 
     args = parser.parse_args()
     args.locale_path = available_locales[args.locale]

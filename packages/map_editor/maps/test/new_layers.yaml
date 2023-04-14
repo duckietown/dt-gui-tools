@@ -1,0 +1,4 @@
+new_layers:
+  map_1/new_layer1:
+    color: yellow
+    l: [1, 2]
