@@ -13,6 +13,7 @@ class SaveImageForm(QDialog):
         self.setWindowTitle("Info for saving map image")
         self.formGroupBox = QGroupBox("Init info")
         self.image_name = QLineEdit(self)
+        self.image_name.setText("image")
         self.height = QLineEdit(self)
         self.height.setText(f"{default_height}")
         self.height.setValidator(QIntValidator())
