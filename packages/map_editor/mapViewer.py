@@ -78,6 +78,7 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
         self.map = default_map_storage(f"{work_dir}/maps/empty_map")
         self.map_frame_tree = FrameTreeStorage()
         self.init_handlers()
+        self.set_tile_map()
         self.set_map_viewer_sizes()
         self.coordinates_transformer = CoordinatesTransformer(self.scale,
                                                               self.map_height,
@@ -162,17 +163,18 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
         self.grid_height = self.tile_height * self.grid_scale
 
     def set_tile_map(self) -> None:
-        tile_maps = self.get_layer(TILE_MAPS)
-        self.tile_map = [elem for elem in tile_maps][0]
+        self.tile_map = list(self.get_layer(TILE_MAPS).keys())[0]
 
     def set_relative_to(self, object_name: str, value: str) -> None:
         self.handlers.handle(
             command=AddRelativeToObj(object_name, value))
 
     def get_ids_by_type(self, type_name: str) -> List[int]:
-        return [sign.id for sign in self.get_layer(TRAFFIC_SIGNS).values() if (sign.type.value == type_name)]
+        return [sign.id for sign in self.get_layer(TRAFFIC_SIGNS).values()
+                if sign.type.value == type_name]
 
-    def set_object_id(self, layer_name: str, object_name: str, obj_id: int, obj_type: str) -> None:
+    def set_object_id(self, layer_name: str, object_name: str, obj_id: int,
+                      obj_type: str) -> None:
         if layer_name in (WATCHTOWERS, VEHICLES):
             obj_id = str(obj_id)
         elif layer_name == TRAFFIC_SIGNS:
@@ -377,7 +379,8 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
         obj_width = obj.width() if obj.is_draggable() else 0
         obj_height = obj.height() if obj.is_draggable() else 0
         frame_obj_coord = self.get_frame_object(obj.name)["pose"]
-        view_coord = self.get_final_pos(obj.name, frame_obj_coord["x"], frame_obj_coord["y"])
+        view_coord = self.get_final_pos(obj.name, frame_obj_coord["x"],
+                                        frame_obj_coord["y"])
         new_coordinates = (
             self.get_x_to_view(
                 view_coord[0], obj_width) + self.offset_x,
