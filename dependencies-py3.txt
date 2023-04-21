@@ -1,8 +1,5 @@
 # LIST YOUR PYTHON3 PACKAGES HERE
 
-# Duckietown World
-duckietown-world-daffy
-
 # Map editor
 PyQt5==5.14.1
 PyYAML==5.3.1
