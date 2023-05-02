@@ -3,7 +3,7 @@
   <name>led_widget</name>
   <version>1.0.0</version>
   <description>
-    A package for launching the led controller widget
+    A package for launching the LED controller widget
 </description>
 
 <author email="kathryn@duckietown.com">Kathryn Hite</author>

@@ -17,10 +17,10 @@ from std_msgs.msg import ColorRGBA
 HZ = 30
 SCREEN_SIZE = 300
 time_to_wait = 10000
-color_map: Dict = {"red": [255.0, 0.0, 0.0],
-                   "green": [0.0, 255.0, 0.0],
-                   "blue": [0.0, 0.0, 255.0],
-                   "white": [255.0, 255.0, 255.0]}
+color_map: Dict = {"red": [1.0, 0.0, 0.0],
+                   "green": [0.0, 1.0, 0.0],
+                   "blue": [0.0, 0.0, 1.0],
+                   "white": [1.0, 1.0, 1.0]}
 
 
 class ROSManager(QThread):
@@ -31,7 +31,7 @@ class ROSManager(QThread):
         rospy.init_node('led_widget', anonymous=False)
         self.pub_leds = rospy.Publisher(
             "~led_pattern",
-            LedPattern,
+            LEDPattern,
             queue_size=1
         )
         self._is_shutdown = False
@@ -78,7 +78,7 @@ class MainWindow(QMainWindow):
         # Set up the LED message
         self.message: LEDPattern = LEDPattern()
         self.intensity: float = 1.0
-        self.color_list: List[ColorRGBA] = ColorRGBA() * 5
+        self.color_list: List[ColorRGBA] = [ColorRGBA()] * 5
 
     def set_up_interface(self, title: str):
         self.setWindowTitle(title)
@@ -111,7 +111,7 @@ class MainWindow(QMainWindow):
         sld.sliderReleased.connect(self.slider_changed)
 
     def slider_changed(self):
-        self.intensity = float(self.sender().value() / 100)
+        self.intensity = round(float(self.sender().value() / 100), 2)
 
         for rgba in self.color_list:
             rgba.a = self.intensity
@@ -141,7 +141,7 @@ class MainWindow(QMainWindow):
         return button
 
     def color_button_clicked(self):
-        color = self.sender()
+        color = self.sender().objectName()
 
         for rgba in self.color_list:
             rgba.r = color_map[color][0]
@@ -158,6 +158,17 @@ class MainWindow(QMainWindow):
         self.close()
 
 
+def print_hint():
+    print("\n\n\n")
+    print("LED Widget for your Duckiebot")
+    print("-----------------------------------")
+    print("\n")
+    print("Use the color buttons to update the LEDs on your Duckiebot to a new color.")
+    print("Use the slider on the right to update the brightness of the LEDs.")
+    print("Use the dashed buttons to blink the Duckiebot's LEDs.")
+    print("\n")
+
+
 if __name__ == '__main__':
     # Requires a vehicle to connect to
     if len(sys.argv) < 2:
@@ -166,6 +177,7 @@ if __name__ == '__main__':
         veh_name = sys.argv[1]
 
     # Run the app window
+    print_hint()
     app = QApplication(sys.argv)
     app.setApplicationName(f"{veh_name} - LED Control Widget")
     m = MainWindow(veh_name)
