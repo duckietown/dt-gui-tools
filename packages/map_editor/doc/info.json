@@ -12,10 +12,8 @@
             "id": "road",
             "elements": [
                 "straight",
-                "curve_left",
-                "curve_right",
-                "3way_left",
-                "3way_right",
+                "curve",
+                "3way",
                 "4way"
             ]
         },
@@ -30,7 +28,6 @@
             },
             "id": "block",
             "elements": [
-                "empty",
                 "asphalt",
                 "grass",
                 "floor"
@@ -49,9 +46,9 @@
             "elements": [
                 "stop",
                 "yield",
-                "no-right-turn",
-                "no-left-turn",
-                "do-not-enter"
+                "no_right_turn",
+                "no_left_turn",
+                "do_not_enter"
             ]
         },
         {
@@ -65,12 +62,12 @@
             },
             "id": "info",
             "elements": [
-                "oneway-right",
-                "oneway-left",
-                "4-way-intersect",
-                "right-T-intersect",
-                "left-T-intersect",
-                "T-intersection"
+                "oneway_right",
+                "oneway_left",
+                "four_way_intersect",
+                "right_t_intersect",
+                "left_t_intersect",
+                "t_intersection"
             ]
         },
         {
@@ -85,8 +82,8 @@
             "id": "spec",
             "elements": [
                 "pedestrian",
-                "t-light-ahead",
-                "duck-crossing",
+                "t_light_ahead",
+                "duck_crossing",
                 "parking"
             ]
         },
@@ -96,21 +93,13 @@
                     "name": "Городские объекты"
                 },
                 "en": {
-                    "name": "City object"
+                    "name": "City objects"
                 }
             },
             "id": "objects",
             "elements": [
-                "trafficlight",
-                "barrier",
-                "cone",
-                "duckie",
-                "duckiebot",
-                "tree",
-                "house",
-                "truck",
-                "bus",
-                "building"
+                "citizens",
+                "vehicles"
             ]
         },
         {
@@ -122,9 +111,9 @@
                     "name": "watchtowers"
                 }
             },
-            "id": "watchower",
+            "id": "watchtowers",
             "elements": [
-                "watchtower"
+                "watchtowers"
             ]
         },
         {
@@ -136,15 +125,36 @@
                     "name": "Apriltags"
                 }
             },
-            "id": "apriltag",
+            "id": "ground_tags",
             "elements": [
-                "apriltag"
+                "ground_tags"
+            ]
+        },
+         {
+            "lang": {
+                "ru": {
+                    "name": "В планах"
+                },
+                "en": {
+                    "name": "Coming soon"
+                }
+            },
+            "id": "coming_soon",
+            "elements": [
+                "trafficlight",
+                "barrier",
+                "cone",
+                "tree",
+                "house",
+                "truck",
+                "bus",
+                "building"
             ]
         }
     ],
     "info": {
-        "duck-crossing": {
-            "type": "sign",
+        "duck_crossing": {
+            "type": "traffic_sign",
             "lang": {
                 "ru": {
                     "name": "Осторожно, уточки",
@@ -155,7 +165,7 @@
                     "info": "Special sign. Indicates the place where ducks cross the road."
                 }
             },
-            "icon": "img/signs/duck-crossing.png"
+            "icon": "img/traffic_signs/duck_crossing.png"
         },
         "barrier": {
             "type": "object",
@@ -204,7 +214,7 @@
             "icon": "img/objects/house.png"
         },
         "stop": {
-            "type": "sign",
+            "type": "traffic_sign",
             "lang": {
                 "ru": {
                     "name": "Стоп",
@@ -215,28 +225,28 @@
                     "info": "Regulatory sign. It obliges to stop in front of it."
                 }
             },
-            "icon": "img/signs/stop.png"
+            "icon": "img/traffic_signs/stop.png"
         },
-        "curve_left": {
+        "curve": {
             "lang": {
                 "ru": {
-                    "name": "Левый поворот",
-                    "info": "Поворот налево с двумя полосами движения. Ограничен сплошной белой разметкой. Полосы разграничены прерывистой жёлтой линией."
+                    "name": "Поворот",
+                    "info": "Поворот с двумя полосами движения. Ограничен сплошной белой разметкой. Полосы разграничены прерывистой жёлтой линией."
                 },
                 "en": {
-                    "name": "Left turn",
-                    "info": "Left turn with two lanes. Limited to solid white markings. The stripes are delimited by a dashed yellow line."
+                    "name": "Turn",
+                    "info": "Turn with two lanes. Limited to solid white markings. The stripes are delimited by a dashed yellow line."
                 }
             },
             "red": 0,
             "type": "block",
             "length": 86,
             "yellow": 45,
-            "icon": "img/tiles/curve_left.png",
+            "icon": "img/tiles/curve.png",
             "white": 110
         },
-        "duckiebot": {
-            "type": "object",
+        "vehicles": {
+            "type": "vehicle",
             "lang": {
                 "ru": {
                     "name": "Дакибот",
@@ -247,25 +257,7 @@
                     "info": "City object. A cute terminator duck."
                 }
             },
-            "icon": "img/objects/duckiebot.png"
-        },
-        "curve_right": {
-            "lang": {
-                "ru": {
-                    "name": "Правый поворот",
-                    "info": "Поворот направо с двумя полосами движения. Ограничен сплошной белой разметкой. Полосы разграничены прерывистой жёлтой линией."
-                },
-                "en": {
-                    "name": "Right turn",
-                    "info": "Right turn with two lanes. Limited to solid white markings. The stripes are delimited by a dashed yellow line."
-                }
-            },
-            "red": 0,
-            "type": "block",
-            "length": 86,
-            "yellow": 45,
-            "icon": "img/tiles/curve_right.png",
-            "white": 110
+            "icon": "img/objects/vehicles.png"
         },
         "floor": {
             "lang": {
@@ -300,7 +292,7 @@
             "icon": "img/objects/tree.png"
         },
         "yield": {
-            "type": "sign",
+            "type": "traffic_sign",
             "lang": {
                 "ru": {
                     "name": "Уступи дорогу",
@@ -311,7 +303,7 @@
                     "info": "Regulatory sign. Demands to give way at an intersection."
                 }
             },
-            "icon": "img/signs/yield.png"
+            "icon": "img/traffic_signs/yield.png"
         },
         "grass": {
             "lang": {
@@ -331,26 +323,26 @@
             "icon": "img/tiles/grass.png",
             "white": 0
         },
-        "3way_left": {
+        "3way": {
             "lang": {
                 "ru": {
-                    "name": "Т-образный левый перекрёсток",
-                    "info": "Левый Т-образный перекрёсток с красными стоп линиями для остановки машин."
+                    "name": "Т-образный перекрёсток",
+                    "info": "Т-образный перекрёсток с красными стоп линиями для остановки машин."
                 },
                 "en": {
-                    "name": "T-shaped left crossroads",
-                    "info": "Left T-junction with red stop lines to stop cars."
+                    "name": "T-shaped crossroads",
+                    "info": "T-junction with red stop lines to stop cars."
                 }
             },
             "red": 90,
             "type": "block",
             "length": 61,
             "yellow": 15,
-            "icon": "img/tiles/3way_left.png",
+            "icon": "img/tiles/3way.png",
             "white": 81
         },
-        "right-T-intersect": {
-            "type": "sign",
+        "right_t_intersect": {
+            "type": "traffic_sign",
             "lang": {
                 "ru": {
                     "name": "T-образный правый перекрёсток",
@@ -361,10 +353,10 @@
                     "info": "Information sign. Means there is a right T-junction ahead."
                 }
             },
-            "icon": "img/signs/right-T-intersect.png"
+            "icon": "img/traffic_signs/right_t_intersect.png"
         },
-        "duckie": {
-            "type": "object",
+        "citizens": {
+            "type": "citizen",
             "lang": {
                 "ru": {
                     "name": "Уточка",
@@ -375,28 +367,10 @@
                     "info": "City object. A cute duck."
                 }
             },
-            "icon": "img/objects/duckie.png"
+            "icon": "img/objects/citizens.png"
         },
-        "3way_right": {
-            "lang": {
-                "ru": {
-                    "name": "Т-образный правый перекрёсток",
-                    "info": "Правый Т-образный перекрёсток с красными стоп линиями для остановки машин."
-                },
-                "en": {
-                    "name": "T-shaped right crossroads",
-                    "info": "Right T-junction with red stop lines to stop cars."
-                }
-            },
-            "red": 90,
-            "type": "block",
-            "length": 61,
-            "yellow": 15,
-            "icon": "img/tiles/3way_right.png",
-            "white": 81
-        },
-        "T-intersection": {
-            "type": "sign",
+        "t_intersection": {
+            "type": "traffic_sign",
             "lang": {
                 "ru": {
                     "name": "T-образный перекрёсток",
@@ -407,10 +381,10 @@
                     "info": "Information sign. Means there is a T-junction ahead."
                 }
             },
-            "icon": "img/signs/T-intersection.png"
+            "icon": "img/traffic_signs/t_intersection.png"
         },
-        "4-way-intersect": {
-            "type": "sign",
+        "four_way_intersect": {
+            "type": "traffic_sign",
             "lang": {
                 "ru": {
                     "name": "Перекресток",
@@ -421,7 +395,7 @@
                     "info": "Information sign. Means that there is a 4-way intersection ahead."
                 }
             },
-            "icon": "img/signs/4-way-intersect.png"
+            "icon": "img/traffic_signs/four_way_intersect.png"
         },
         "cone": {
             "type": "object",
@@ -437,8 +411,8 @@
             },
             "icon": "img/objects/cone.png"
         },
-        "left-T-intersect": {
-            "type": "sign",
+        "left_t_intersect": {
+            "type": "traffic_sign",
             "lang": {
                 "ru": {
                     "name": "T-образный левый перекрёсток",
@@ -446,10 +420,10 @@
                 },
                 "en": {
                     "name": "T-shaped left crossroads",
-                    "info": "Information sign. Means there is a left T-intersection ahead."
+                    "info": "Information sign. Means there is a left t_intersection ahead."
                 }
             },
-            "icon": "img/signs/left-T-intersect.png"
+            "icon": "img/traffic_signs/left_t_intersect.png"
         },
         "4way": {
             "lang": {
@@ -469,8 +443,8 @@
             "icon": "img/tiles/4way.png",
             "white": 40
         },
-        "no-left-turn": {
-            "type": "sign",
+        "no_left_turn": {
+            "type": "traffic_sign",
             "lang": {
                 "ru": {
                     "name": "Поворот налево запрещен",
@@ -481,10 +455,10 @@
                     "info": "Regulatory sign. Prohibits left turn and U-turn."
                 }
             },
-            "icon": "img/signs/no-left-turn.png"
+            "icon": "img/traffic_signs/no_left_turn.png"
         },
-        "do-not-enter": {
-            "type": "sign",
+        "do_not_enter": {
+            "type": "traffic_sign",
             "lang": {
                 "ru": {
                     "name": "Кирпич",
@@ -495,7 +469,7 @@
                     "info": "Regulatory sign. Prohibits passage under the sign."
                 }
             },
-            "icon": "img/signs/do-not-enter.png"
+            "icon": "img/traffic_signs/do_not_enter.png"
         },
         "bus": {
             "type": "object",
@@ -511,8 +485,8 @@
             },
             "icon": "img/objects/bus.png"
         },
-        "t-light-ahead": {
-            "type": "sign",
+        "t_light_ahead": {
+            "type": "traffic_sign",
             "lang": {
                 "ru": {
                     "name": "Светофор",
@@ -523,7 +497,7 @@
                     "info": "Special sign. Indicates the presence of traffic light."
                 }
             },
-            "icon": "img/signs/t-light-ahead.png"
+            "icon": "img/traffic_signs/t_light_ahead.png"
         },
         "building": {
             "type": "object",
@@ -539,8 +513,8 @@
             },
             "icon": "img/objects/building.png"
         },
-        "no-right-turn": {
-            "type": "sign",
+        "no_right_turn": {
+            "type": "traffic_sign",
             "lang": {
                 "ru": {
                     "name": "Поворот направо запрещен",
@@ -551,7 +525,7 @@
                     "info": "Regulatory sign. Prohibits right turn."
                 }
             },
-            "icon": "img/signs/no-right-turn.png"
+            "icon": "img/traffic_signs/no_right_turn.png"
         },
         "trafficlight": {
             "type": "object",
@@ -586,7 +560,7 @@
             "white": 0
         },
         "parking": {
-            "type": "sign",
+            "type": "traffic_sign",
             "lang": {
                 "ru": {
                     "name": "Парковка",
@@ -597,10 +571,10 @@
                     "info": "Special sign. Indicates a parking spot."
                 }
             },
-            "icon": "img/signs/parking.png"
+            "icon": "img/traffic_signs/parking.png"
         },
-        "oneway-right": {
-            "type": "sign",
+        "oneway_right": {
+            "type": "traffic_sign",
             "lang": {
                 "ru": {
                     "name": "Односторонее движение направо",
@@ -611,10 +585,10 @@
                     "info": "Information sign. Means that one-way traffic starts from left to right."
                 }
             },
-            "icon": "img/signs/oneway-right.png"
+            "icon": "img/traffic_signs/oneway_right.png"
         },
         "pedestrian": {
-            "type": "sign",
+            "type": "traffic_sign",
             "lang": {
                 "ru": {
                     "name": "Пешеходный переход",
@@ -625,10 +599,10 @@
                     "info": "Special sign. Indicates a pedestrian crossing."
                 }
             },
-            "icon": "img/signs/pedestrian.png"
+            "icon": "img/traffic_signs/pedestrian.png"
         },
         "truck": {
-            "type": "object",
+            "type": "truck",
             "lang": {
                 "ru": {
                     "name": "Грузовик",
@@ -641,8 +615,8 @@
             },
             "icon": "img/objects/truck.png"
         },
-        "oneway-left": {
-            "type": "sign",
+        "oneway_left": {
+            "type": "traffic_sign",
             "lang": {
                 "ru": {
                     "name": "Односторонее движение налево",
@@ -653,9 +627,9 @@
                     "info": "Information sign. Says that one-way traffic starts from right to left."
                 }
             },
-            "icon": "img/signs/oneway-left.png"
+            "icon": "img/traffic_signs/oneway_left.png"
         },
-        "watchtower": {
+        "watchtowers": {
             "type": "watchtower",
             "lang": {
                 "ru": {
@@ -667,10 +641,10 @@
                     "info": "test1 watchtower"
                 }
             },
-            "icon": "img/objects/watchtower.png"
+            "icon": "img/objects/watchtowers.png"
         },
-        "apriltag": {
-            "type": "apriltag",
+        "ground_tags": {
+            "type": "ground_tag",
             "lang": {
                 "ru": {
                     "name": "Apriltag",
@@ -681,25 +655,8 @@
                     "info": "Apriltag_en"
                 }
             },
-            "icon": "img/apriltags/apriltag.png"
-        },
-        "empty": {
-            "lang": {
-                "ru": {
-                    "name": "Пустой блок",
-                    "info": "Пустой блок для заполнения карты."
-                },
-                "en": {
-                    "name": "Empty block",
-                    "info": "An empty block to fill map."
-                }
-            },
-            "red": 0,
-            "type": "block",
-            "length": 0,
-            "yellow": 0,
-            "icon": "img/tiles/empty.png",
-            "white": 0
+            "icon": "img/objects/ground_tags.png"
         }
-    }
+    },
+    "description": "Moving map: Ctrl + LMB or Middle button\n\nEdit object: RMB on object\n\nHighlight area: LMB\n\nMove object: LMB on object and hold\n\nSelect tile type in left menu: Single click\n\nSelect object in left menu: Double click"
 }
