@@ -25,7 +25,7 @@ TRAFFIC_SIGNS_TYPES = ("stop", "yield", "no_right_turn", "no_left_turn",
                         "left_t_intersect", "t_intersection", "pedestrian",
                         "t_light_ahead", "duck_crossing", "parking")
 WATCHTOWERS_CONFIGURATION = ("WT18", "WT19")
-VEHICLES_CONFIGURATION = ("DB18", "DB19", "DB20", "DB21M", "DB21J", "DB21R")
+VEHICLES_CONFIGURATION = ("DB18", "DB19", "DB20", "DB21M", "DB21J", "DBR4")
 CITIZENS_COLORS = ("yellow", "red", "green", "grey")
 VEHICLES_COLORS = ("blue", "red", "green", "grey")
 FORM_DICT = {
