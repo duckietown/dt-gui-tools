@@ -169,7 +169,7 @@ ENV HTTP_PORT 8087
 RUN git clone https://github.com/ros-perception/image_pipeline.git
 
 # uninstall opencv-python-headless as it obscures opencv-python
-RUN pip3 uninstall opencv-python-headless
+RUN pip3 uninstall --yes opencv-python-headless
 
 # build packages
 RUN . /opt/ros/${ROS_DISTRO}/setup.sh && \
