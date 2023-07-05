@@ -168,6 +168,9 @@ ENV HTTP_PORT 8087
 # get the image_pipeline (this is needed to avoid issues with python2 shebang)
 RUN git clone https://github.com/ros-perception/image_pipeline.git
 
+# uninstall opencv-python-headless as it obscures opencv-python
+RUN pip3 uninstall opencv-python-headless
+
 # build packages
 RUN . /opt/ros/${ROS_DISTRO}/setup.sh && \
   catkin build \
