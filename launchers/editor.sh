@@ -9,7 +9,7 @@ dt-launchfile-init
 # ----------------------------------------------------------------------------
 
 
-# NOTE: Use the variable REPO_PATH to know the absolute path to your code
+# NOTE: Use the variable DT_PROJECT_PATH to know the absolute path to your code
 # NOTE: Use `dt-exec COMMAND` to run the main process (blocking process)
 
 
@@ -20,7 +20,7 @@ locale=${1:-'en'}
 wkdir="/out"
 
 # launching app
-cd $DT_REPO_PATH/packages/map_editor/
+cd $DT_PROJECT_PATH/packages/map_editor/
 dt-exec python3.8 main.py --locale $locale --wkdir $wkdir
 
 

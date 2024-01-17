@@ -1,0 +1,15 @@
+*.png filter=lfs diff=lfs merge=lfs -text
+*.jpg filter=lfs diff=lfs merge=lfs -text
+*.jpeg filter=lfs diff=lfs merge=lfs -text
+*.gif filter=lfs diff=lfs merge=lfs -text
+*.tiff filter=lfs diff=lfs merge=lfs -text
+*.eps filter=lfs diff=lfs merge=lfs -text
+*.pdf filter=lfs diff=lfs merge=lfs -text
+
+LICENSE.pdf  !filter !diff !merge binary
+docs/src/logo.png  !filter !diff !merge binary
+
+# this is to avoid wasting space with images already committed in the history of the repository
+packages/**/*.png  !filter !diff !merge binary
+packages/**/*.jpg  !filter !diff !merge binary
+assets/vnc/**/*.png  !filter !diff !merge binary

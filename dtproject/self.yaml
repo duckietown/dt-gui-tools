@@ -1,0 +1,8 @@
+name: "dt-gui-tools"
+maintainer:
+    name: "Andrea F. Daniele"
+    email: "afdaniele@duckietown.com"
+description: "Provides access to GUI-based tools (e.g., rviz, rqt_image_view)"
+version: 4.0.3
+# pick an icon from: https://fontawesome.com/v4.7.0/icons/
+icon: desktop
