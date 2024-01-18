@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<launch>
+    <arg name="veh" doc="Name of vehicle. ex: megaman"/>
+    <arg name="pkg_name" value="extrinsic_calibration"/>
+    <arg name="node_name" default="extrinsic_calibration_node"/>
+    <arg name="config" default="default" doc="Specify a config."/>
+    <arg name="param_file" default="$(find extrinsic_calibration)/config/$(arg node_name)/$(arg config).yaml" doc="Param file path"/>
+
+    <!-- Subscription -->
+    <!-- "~image": sensor_msgs/CompressedImage. Input (distorted) compressed image in JPEG format. -->
+    <!-- "~camera_info": sensor_msgs/CompressedImage. Input camera info. -->
+
+    <!-- Publication -->
+    <!-- (none) -->
+
+    <group ns="$(arg veh)">
+        <remap from="extrinsic_calibration_node/image" to="camera_node/image/compressed"/>
+        <remap from="extrinsic_calibration_node/camera_info" to="camera_node/camera_info"/>
+
+        <node name="$(arg node_name)" pkg="$(arg pkg_name)" type="$(arg node_name).py" output="screen">
+            <rosparam command="load" file="$(arg param_file)"/>
+        </node>
+    </group>
+</launch>
