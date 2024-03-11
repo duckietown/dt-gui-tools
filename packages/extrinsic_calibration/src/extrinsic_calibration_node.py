@@ -308,7 +308,7 @@ class CameraExtrinsicsCalibrationNode(DTROS):
 
     def __init__(self):
         super(CameraExtrinsicsCalibrationNode, self).__init__(
-            node_name="extrinsic_calibration_node", node_type=NodeType.CALIBRATION, fsm_controlled=False
+            node_name="extrinsic_calibration_node", node_type=NodeType.CALIBRATION
         )
         # get the name of the robot
         self.veh = rospy.get_namespace().strip("/")
@@ -411,25 +411,3 @@ if __name__ == "__main__":
     node = CameraExtrinsicsCalibrationNode()
     # spin forever
     rospy.spin()
-
-
-# if __name__ == "__main__":
-#     # run calibration step
-#     calibration = CameraExtrinsicsCalibration(quiet=True)
-#     try:
-#         calibration.run()
-#     except KeyboardInterrupt:
-#         exit(0)
-#     # get homography
-#     homography = calibration.H
-#
-#     # exit if we cancelled
-#     if calibration.was_cancelled:
-#         exit(0)
-#
-#     # run validation step
-#     validation = CameraExtrinsicsValidation(homography)
-#     try:
-#         validation.run()
-#     except KeyboardInterrupt:
-#         exit(0)
