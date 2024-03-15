@@ -3,6 +3,7 @@
 from typing import Dict, Callable, List, Optional
 
 import cv2
+import requests
 import yaml
 import rospy
 import numpy as np
@@ -342,7 +343,7 @@ class CameraExtrinsicsCalibrationNode(DTROS):
         # create URL
         url: str = f"http://{self.veh}.local/files/data/config/calibrations/camera_extrinsic/{self.veh}.yaml"
         # save homography
-        HomographyToolkit.save_to_http(H, url)
+        requests.post(url, data=yaml.dump({"homography": H.flatten().tolist()}))
 
     def _on_calibration_saved(self):
         # add H to camera model
