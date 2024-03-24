@@ -46,3 +46,11 @@ gtk2-engines-murrine
 arc-theme
 
 ffmpeg
+
+python3-tk
+
+# needed by openCV to open windows
+libgl1
+libsm6
+libxrender1
+libfontconfig1
