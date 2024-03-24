@@ -4,4 +4,4 @@
 # Duckietown World
 duckietown-world-daffy==6.4.3
 
-lib-dt-computer-vision==0.1.5
+lib-dt-computer-vision==0.1.7

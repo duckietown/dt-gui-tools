@@ -339,7 +339,11 @@ class CameraExtrinsicsCalibrationNode(DTROS):
         rospy.signal_shutdown("Calibration cancelled.")
         self._calibrator = None
 
-    def _save_calibration(self, H: ResolutionIndependentHomography):
+    def _save_calibration(self, Hindep: ResolutionIndependentHomography):
+        Hdep: ResolutionDependentHomography = Hindep.camera_specific(self._camera)
+        
+        H = Hdep @ self._camera.homography_pixel2vector()
+        
         # create URL
         url: str = f"http://{self.veh}.local/files/data/config/calibrations/camera_extrinsic/{self.veh}.yaml"
         # save homography
