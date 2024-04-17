@@ -4,22 +4,15 @@ ros-noetic-rqt
 ros-noetic-rqt-common-plugins
 ros-noetic-rqt-tf-tree
 ros-noetic-image-geometry
+ros-noetic-camera-calibration
 python3-pygame
-
-# We are using camera-calibration from source
-# to prevent python2 shebang error
-# NOTE: this should go once camera-calibration is fixed upstream
-# camera-calibration requirements:
-ros-noetic-camera-calibration-parsers
-ros-noetic-camera-info-manager
-libgtk-3-dev
-ros-noetic-tf2-geometry-msgs
 
 # NOTE: these are from focal vnc
 software-properties-common
 curl
 apache2-utils
 
+# these are for VNC
 supervisor
 nginx
 sudo

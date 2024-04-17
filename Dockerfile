@@ -165,9 +165,6 @@ RUN ln -sf /usr/local/lib/web/frontend/static/websockify \
 # configure novnc
 ENV HTTP_PORT 8087
 
-# get the image_pipeline (this is needed to avoid issues with python2 shebang)
-RUN git clone https://github.com/ros-perception/image_pipeline.git
-
 # build packages
 RUN . /opt/ros/${ROS_DISTRO}/setup.sh && \
   catkin build \
