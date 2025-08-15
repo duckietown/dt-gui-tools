@@ -68,6 +68,41 @@ class MapAPI:
         self.init_info_form.show()
         self.set_move_mode(False)
 
+    def _ensure_map_base(self, target_dir: str) -> None:
+        """Ensure a usable Duckiematrix map base: main.yaml and assets/.
+
+        - Creates main.yaml if missing
+        - Copies template assets/ if missing
+        """
+        try:
+            # 1) main.yaml
+            main_yaml_path = os.path.join(target_dir, "main.yaml")
+            if not os.path.isfile(main_yaml_path):
+                main_yaml_content = (
+                    "version: 1.0\n"
+                    "main:\n"
+                    "  frames: !include \"frames.yaml\"\n"
+                    "  tiles: !include \"tiles.yaml\"\n"
+                    "  tile_maps: !include \"tile_maps.yaml\"\n"
+                    "  vehicles: !include \"vehicles.yaml\"\n"
+                    "  cameras: !include \"cameras.yaml\"\n"
+                    "  traffic_signs: !include \"traffic_signs.yaml\"\n"
+                    "  ground_tags: !include \"ground_tags.yaml\"\n"
+                    "  citizens: !include \"citizens.yaml\"\n"
+                    "  watchtowers: !include \"watchtowers.yaml\"\n"
+                )
+                with open(main_yaml_path, "w", encoding="utf-8") as f:
+                    f.write(main_yaml_content)
+            # 2) assets/
+            assets_dir = os.path.join(target_dir, "assets")
+            if not os.path.isdir(assets_dir):
+                # template assets live under dt-gui-tools/maps/empty_map/assets
+                template_assets = Path(__file__).resolve().parents[2] / "maps" / "empty_map" / "assets"
+                if os.path.isdir(template_assets):
+                    shutil.copytree(str(template_assets), assets_dir)
+        except Exception as e:
+            logging.exception(f"Failed to ensure map base in {target_dir}: {e}")
+
     #  Open map
     def create_map_triggered(self, info: Dict[str, Any]) -> None:
         if info["x"] == "" or info["y"] == "":
@@ -88,6 +123,7 @@ class MapAPI:
                 if os.path.exists(path):
                     shutil.rmtree(path)
                 os.makedirs(path)
+                self._ensure_map_base(str(path))
                 self._map_viewer.create_new_map(info, path)
                 self.save_map_triggered()
             except OSError as err:
@@ -127,15 +163,43 @@ class MapAPI:
 
     #  Save map
     def save_map_triggered(self) -> None:
-        self._map_storage.map.to_disk()
+        try:
+            dm = self._map_storage.map
+            save_dir = getattr(dm, "_path", None)
+            save_name = getattr(dm, "_name", None)
+            logging.info(f"Saving map to disk. name={save_name} dir={save_dir}")
+            print(f"[MapEditor] Saving map to disk. name={save_name} dir={save_dir}")
+            if save_dir:
+                self._ensure_map_base(save_dir)
+            self._map_storage.map.to_disk()
+            logging.info("Map saved successfully")
+            print("[MapEditor] Map saved successfully")
+        except Exception as e:
+            logging.exception("Failed to save map")
+            print(f"[MapEditor] Failed to save map: {e}")
 
     #  Save map as
     def save_map_as_triggered(self, parent: QtWidgets.QWidget) -> bool:
         path = self._qt_api.get_dir(parent, "save")
         self.set_move_mode(False)
         if path:
-            change_map_directory(self._map_storage.map, path)
-            self.save_map_triggered()
+            try:
+                dm = self._map_storage.map
+                old_dir = getattr(dm, "_path", None)
+                old_name = getattr(dm, "_name", None)
+                logging.info(f"Save As selected directory: {path}")
+                print(f"[MapEditor] Save As selected directory: {path}")
+                change_map_directory(dm, path)
+                new_dir = getattr(dm, "_path", None)
+                new_name = getattr(dm, "_name", None)
+                logging.info(f"Changed map directory name={new_name} old_dir={old_dir} new_dir={new_dir}")
+                print(f"[MapEditor] Changed map directory name={new_name} old_dir={old_dir} new_dir={new_dir}")
+                if new_dir:
+                    self._ensure_map_base(new_dir)
+                self.save_map_triggered()
+            except Exception as e:
+                logging.exception("Failed during Save As operation")
+                print(f"[MapEditor] Failed during Save As: {e}")
             return True
         return False
 

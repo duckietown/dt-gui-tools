@@ -9,8 +9,8 @@
     </message>
     <message>
         <location filename="main_design.py" line="308"/>
-        <source>Map Builder</source>
-        <translation></translation>
+        <source>Map Editor</source>
+        <translation>Редактор карт</translation>
     </message>
     <message>
         <location filename="main_design.py" line="309"/>
