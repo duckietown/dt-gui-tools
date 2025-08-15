@@ -88,6 +88,11 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
                                                               self.tile_height)
         self.painter = Painter()
         self.init_all_map_objects()
+        # Ensure vehicles (if any) have valid defaults (e.g., color)
+        try:
+            self._sanitize_vehicle_defaults()
+        except Exception:
+            pass
         self.set_map_size()
         self.setMouseTracking(True)
         self.buffer = Buffer()
@@ -246,8 +251,17 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
     def get_final_pos(self, frame_name: str, x: float, y: float) -> Tuple[float, float]:
         frames = self.get_layer("frames")
         frame_obj = frames[frame_name]
-        while frame_obj.relative_to != self.tile_map:
-            frame_obj = frames[frame_obj.relative_to]
+        # Walk up the frame tree safely until we reach the map root
+        while True:
+            parent = getattr(frame_obj, "relative_to", None)
+            # stop if parent is missing/empty or already at map root
+            if not parent or parent == self.tile_map:
+                break
+            # try to climb one level; stop if parent not found
+            try:
+                frame_obj = frames[parent]
+            except Exception:
+                break
             x += frame_obj.pose.x
             y += frame_obj.pose.y
         return x, y
@@ -990,3 +1004,36 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
         self.painting_tiles("asphalt")
         # delete selected_objects
         self.delete_selected_objects()
+
+    def _sanitize_vehicle_defaults(self) -> None:
+        """If vehicles exist, ensure their color is valid; default to 'blue' when None.
+
+        Does not create vehicles; only fixes invalid ones to prevent dt_maps enum errors.
+        """
+        try:
+            vehicles_layer = None
+            try:
+                vehicles_layer = self.get_layer(VEHICLES)
+            except Exception:
+                vehicles_layer = None
+            if not vehicles_layer:
+                return
+            for v_name, vehicle in list(vehicles_layer.items()):
+                current_color = getattr(vehicle, "color", None)
+                if current_color is None:
+                    success = False
+                    try:
+                        setattr(vehicle, "color", "blue")
+                        # re-check
+                        success = getattr(vehicle, "color", None) is not None
+                    except Exception:
+                        success = False
+                    if not success:
+                        try:
+                            # remove invalid vehicle to avoid crashes
+                            del vehicles_layer[v_name]
+                        except Exception:
+                            pass
+        except Exception:
+            # best-effort sanitation; ignore failures
+            pass

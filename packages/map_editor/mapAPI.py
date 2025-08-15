@@ -84,8 +84,6 @@ class MapAPI:
                     "  frames: !include \"frames.yaml\"\n"
                     "  tiles: !include \"tiles.yaml\"\n"
                     "  tile_maps: !include \"tile_maps.yaml\"\n"
-                    "  vehicles: !include \"vehicles.yaml\"\n"
-                    "  cameras: !include \"cameras.yaml\"\n"
                     "  traffic_signs: !include \"traffic_signs.yaml\"\n"
                     "  ground_tags: !include \"ground_tags.yaml\"\n"
                     "  citizens: !include \"citizens.yaml\"\n"

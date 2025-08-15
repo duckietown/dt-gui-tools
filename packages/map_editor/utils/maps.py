@@ -11,6 +11,15 @@ from dt_maps.Map import REGISTER
 def copy_dir_with_map(path_from: str, path_to: str) -> None:
     if not os.path.exists(path_to):
         shutil.copytree(path_from, path_to)
+        # Remove optional layers that should not be present by default
+        # Vehicles and cameras are added only when the user creates them
+        for optional in ("vehicles.yaml", "cameras.yaml"):
+            opt_path = os.path.join(path_to, optional)
+            if os.path.exists(opt_path):
+                try:
+                    os.remove(opt_path)
+                except OSError:
+                    pass
 
 
 def default_map_storage(map_dir: str) -> MapStorage:
