@@ -1,4 +1,3 @@
-version: 1.0
 tiles:
   map_1/tile_0_0:
     i: 0
@@ -63,11 +62,11 @@ tiles:
   map_1/tile_3_0:
     i: 3
     j: 0
-    type: asphalt
+    type: straight
   map_1/tile_3_1:
     i: 3
     j: 1
-    type: asphalt
+    type: straight
   map_1/tile_3_2:
     i: 3
     j: 2
@@ -75,11 +74,11 @@ tiles:
   map_1/tile_3_3:
     i: 3
     j: 3
-    type: asphalt
+    type: curve
   map_1/tile_3_4:
     i: 3
     j: 4
-    type: asphalt
+    type: straight
   map_1/tile_4_0:
     i: 4
     j: 0

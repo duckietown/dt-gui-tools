@@ -6,7 +6,7 @@ from classes.basic.chain import AbstractHandler
 from classes.basic.command import Command
 from dt_maps.Map import REGISTER
 from mapStorage import MapStorage
-from utils.constants import LAYER_NAME
+from utils.constants import LAYER_NAME, VEHICLES
 from utils.maps import create_layer
 from typing import Dict, Any, Optional
 from copy import deepcopy, copy
@@ -51,9 +51,27 @@ class AbstractLayer(ABC):
         for name, item in layer.items():
             new_item = {}
             for item_filed in self._default_conf:
-                new_item[item_filed] = deepcopy(layer[name][item_filed])
+                # Safely read field; some typed properties (e.g., vehicles.color)
+                # can raise if set to None. Fallback to sensible defaults.
+                try:
+                    value = deepcopy(layer[name][item_filed])
+                except Exception:
+                    # fallback for vehicles color
+                    if self._layer_name == VEHICLES and item_filed == "color":
+                        value = "blue"
+                    else:
+                        try:
+                            value = deepcopy(getattr(layer[name], item_filed))
+                        except Exception:
+                            value = None
+                # Convert typed enums to their underlying values when possible
                 if item_filed in self.fields_with_types():
-                    new_item[item_filed] = new_item[item_filed].value
+                    try:
+                        value = value.value
+                    except Exception:
+                        # leave value as-is if it is already a primitive
+                        pass
+                new_item[item_filed] = value
             new_layer[name] = new_item
         return new_layer
 

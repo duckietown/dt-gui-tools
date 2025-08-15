@@ -1,4 +1,3 @@
-version: 1.0
 frames:
   map_1:
     pose:
@@ -9,6 +8,15 @@ frames:
       yaw: 0.0
       z: 0.0
     relative_to: ''
+  map_1/citizen1:
+    pose:
+      pitch: 0.0
+      roll: 0.0
+      x: 0.45924369747899163
+      y: 2.445294117647059
+      yaw: 0.0
+      z: 0.0
+    relative_to: map_1
   map_1/tile_0_0:
     pose:
       pitch: 0.0
@@ -234,12 +242,30 @@ frames:
       yaw: 0.0
       z: 0.0
     relative_to: map_1
+  map_1/vehicle1:
+    pose:
+      pitch: 0.0
+      roll: 0.0
+      x: 1.4522689075630253
+      y: 2.0323529411764705
+      yaw: 0.0
+      z: 0.0
+    relative_to: map_1
+  map_1/vehicle2:
+    pose:
+      pitch: 0.0
+      roll: 0.0
+      x: 1.0
+      y: 1.0
+      yaw: 0.0
+      z: 0.0
+    relative_to: map_1
   map_1/vehicle_0:
     pose:
-      x: 0.88
-      y: 0.185
-      z: 0.0
-      roll: 0.0
       pitch: 0.0
+      roll: 0.0
+      x: 2.000840336134454
+      y: 0.3226470588235294
       yaw: 0.0
+      z: 0.0
     relative_to: map_1
