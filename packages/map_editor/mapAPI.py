@@ -77,20 +77,16 @@ class MapAPI:
         try:
             # 1) main.yaml
             main_yaml_path = os.path.join(target_dir, "main.yaml")
-            if not os.path.isfile(main_yaml_path):
-                main_yaml_content = (
-                    "version: 1.0\n"
-                    "main:\n"
-                    "  frames: !include \"frames.yaml\"\n"
-                    "  tiles: !include \"tiles.yaml\"\n"
-                    "  tile_maps: !include \"tile_maps.yaml\"\n"
-                    "  traffic_signs: !include \"traffic_signs.yaml\"\n"
-                    "  ground_tags: !include \"ground_tags.yaml\"\n"
-                    "  citizens: !include \"citizens.yaml\"\n"
-                    "  watchtowers: !include \"watchtowers.yaml\"\n"
-                )
-                with open(main_yaml_path, "w", encoding="utf-8") as f:
-                    f.write(main_yaml_content)
+            # Always write a minimal, Duckiematrix-compatible main.yaml
+            main_yaml_content = (
+                "version: 1.0\n"
+                "main:\n"
+                "  frames: !include \"frames.yaml\"\n"
+                "  tiles: !include \"tiles.yaml\"\n"
+                "  tile_maps: !include \"tile_maps.yaml\"\n"
+            )
+            with open(main_yaml_path, "w", encoding="utf-8") as f:
+                f.write(main_yaml_content)
             # 2) assets/
             assets_dir = os.path.join(target_dir, "assets")
             if not os.path.isdir(assets_dir):

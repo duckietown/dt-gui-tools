@@ -1,13 +1,1 @@
-vehicles:
-  map_1/vehicle1:
-    color: blue
-    configuration: DB18
-    id: '1'
-  map_1/vehicle2:
-    color: blue
-    configuration: DB18
-    id: '2'
-  map_1/vehicle_0:
-    color: null
-    configuration: DB21M
-    id: null
+vehicles: {}
