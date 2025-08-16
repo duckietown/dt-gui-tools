@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from copy import deepcopy
+import math
 from importlib import import_module
 from PyQt5 import QtWidgets, QtGui, QtCore
 from PyQt5.QtWidgets import QApplication
@@ -232,7 +233,8 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
                                      object_name, layer_name)
         if new_obj:
             frame_obj = self.get_frame_object(object_name)
-            self.rotate_obj(new_obj, frame_obj.pose.yaw)
+            # Map stores yaw in radians; viewer uses degrees
+            self.rotate_obj(new_obj, math.degrees(frame_obj.pose.yaw))
             coordinates = self.get_final_pos(object_name,
                                                  frame_obj.pose.x,
                                                  frame_obj.pose.y)
@@ -385,7 +387,7 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
         self.scene_update()
 
     def rotate_obj_on_map(self, frame_name: str, new_angle: float) -> None:
-        self.handlers.handle(command=RotateCommand(frame_name, new_angle))
+        self.handlers.handle(command=RotateCommand(frame_name, math.radians(new_angle)))
 
     def scaled_obj(self, obj: ImageObject, args: Dict[str, Any]) -> None:
         scale = args["scale"]
