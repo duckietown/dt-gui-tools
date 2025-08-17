@@ -33,6 +33,11 @@ class DuckWindow(QtWidgets.QMainWindow):
 
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        # Fun touch: add a duck emoji to the window title
+        try:
+            self.setWindowTitle("🦆 Map Editor")
+        except Exception:
+            pass
         # necessary in docker (otherwise Permission denied error for saving map)
         copy_dir_with_map("./maps/empty_map", f"{args.wkdir}/maps/empty_map")
         self.map_viewer = MapViewer(args.wkdir)

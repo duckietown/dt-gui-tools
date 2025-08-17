@@ -1,9 +1,0 @@
-wheels:
-  map_0/vehicle_0/wheel_left:
-    encoder:
-      resolution: 135
-    radius: 0.0318
-  map_0/vehicle_0/wheel_right:
-    encoder:
-      resolution: 135
-    radius: 0.0318
