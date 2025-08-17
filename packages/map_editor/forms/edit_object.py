@@ -27,7 +27,7 @@ class EditObject(QDialog):
         self.name = name
         self.is_draggable = is_draggable
         self.info_send["new_config"] = config
-        self.info_send[FRAME] = frame
+        self.info_send[FRAME] = self._sanitize_frame_defaults(frame, frames)
         self.frames = frames
         self.setWindowTitle("Edit object")
         self.formGroupBox = QGroupBox(f"Object: {name}")
@@ -40,8 +40,22 @@ class EditObject(QDialog):
         main_layout = QVBoxLayout(self)
         main_layout.addWidget(self.formGroupBox)
         main_layout.addWidget(self.buttonBox)
-        self.create_form(config, frame)
+        self.create_form(config, self.info_send[FRAME])
         self.setLayout(main_layout)
+
+    def _sanitize_frame_defaults(self, frame: Dict[str, Any], frames: List[str]) -> Dict[str, Any]:
+        pose_defaults = {"x": 0.0, "y": 0.0, "z": 0.0, "roll": 0.0, "pitch": 0.0, "yaw": 0.0}
+        out = frame.copy() if frame else {}
+        # ensure pose dict exists
+        if "pose" not in out or not isinstance(out.get("pose"), dict):
+            out["pose"] = {}
+        for k, v in pose_defaults.items():
+            if out["pose"].get(k) is None:
+                out["pose"][k] = v
+        # ensure relative_to exists
+        if out.get(RELATIVE_TO) in (None, ""):
+            out[RELATIVE_TO] = frames[0] if frames else ""
+        return out
 
     def remove_elem(self, e):
         if e.text() == "Remove":
@@ -119,7 +133,20 @@ class EditObject(QDialog):
     def get_qline_edit(self, row_name: str, row_val: Any,
                        layout: QFormLayout) -> None:
         edit = QLineEdit(self)
-        self.info["types"][row_name] = type(row_val)
+        # choose sensible types for None values
+        if row_val is None:
+            if row_name.startswith("pose."):
+                row_val = 0.0
+                self.info["types"][row_name] = float
+            else:
+                row_val = ""
+                self.info["types"][row_name] = str
+        else:
+            # prefer float for numeric pose fields
+            if row_name.startswith("pose.") and isinstance(row_val, (int, float)):
+                self.info["types"][row_name] = float
+            else:
+                self.info["types"][row_name] = type(row_val)
         self.info[row_name] = edit
         if isinstance(row_val, float):
             edit.setText(f'{row_val:.{self.float_formatting}f}')

@@ -127,25 +127,8 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
                 handlers_list.append(
                     attribute(layer_name=layer_name))
             else:
-                # get unknown layer config from .yaml
-                try:
-                    keys = list(self.map.map.layers[layer_name].keys())
-                except KeyError:
-                    continue
-                conf = {}
-                if len(keys) > 0:
-                    # set default conf with empty values
-                    conf = deepcopy(self.map.map.layers[layer_name][keys[0]])
-                # create dynamic layer
-                dynamic_layer = DynamicLayer(conf=conf,
-                                             layer_name=layer_name,
-                                             map=self.map.map)
-                # register new dynamic layer in map.layers
-                REGISTER[layer_name] = dynamic_layer
-                # added basic layer handler
-                handler = BasicLayerHandler(default_conf=conf,
-                                            layer_name=layer_name)
-                handlers_list.append(handler)
+                # Skip unknown/runtime layers (e.g., renderer/lights/wheels) that the editor does not manage
+                continue
         for i in range(len(handlers_list) - 1):
             handlers_list[i].set_next(handlers_list[i + 1])
         self.handlers = handlers_list[0]
@@ -418,8 +401,26 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
         self.rotate_obj(obj, obj.yaw + 90)
         self.rotate_obj_on_map(tile_name, obj.yaw)
 
-    def is_selected_tile(self, tile: Tile, is_dict: bool = False) -> bool:
-        tile_i, tile_j = (tile["i"], tile["j"]) if is_dict else (tile.i, tile.j)
+    def is_selected_tile(self, tile: Tile, is_dict: bool = False, tile_name: Optional[str] = None) -> bool:
+        try:
+            tile_i, tile_j = (tile["i"], tile["j"]) if is_dict else (tile.i, tile.j)
+        except Exception:
+            # derive indices from name pattern .../tile_i_j when fields are missing
+            tile_i, tile_j = None, None
+            if tile_name is None:
+                # try to find name by reverse lookup from objects dict
+                for name, obj in self.objects.items():
+                    if obj.layer_name == TILES and self.get_image_object(name) is not None and obj == self.get_image_object(name):
+                        tile_name = name
+                        break
+            if tile_name:
+                import re
+                m = re.search(r"/tile_(\d+)_(\d+)$", tile_name)
+                if m:
+                    tile_i = int(m.group(1))
+                    tile_j = int(m.group(2))
+            if tile_i is None or tile_j is None:
+                return False
         return ((tile_i + 1) * self.tile_width >= self.tile_selection[0] and
                 tile_i * self.tile_width <= self.tile_selection[2] and
                 (tile_j + 1) * self.tile_height >= self.tile_selection[3] and
@@ -461,9 +462,23 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
             default_layer_conf = {}
         for key in default_layer_conf:
             try:
+                # prefer typed value when available
                 default_layer_conf[key] = obj[key].value
-            except AttributeError:
-                default_layer_conf[key] = obj[key]
+            except Exception:
+                # fallback to raw value when present
+                try:
+                    default_layer_conf[key] = obj[key]
+                except Exception:
+                    # final fallback for tiles missing i/j: derive from name
+                    if layer_name == TILES and key in ("i", "j"):
+                        import re
+                        m = re.search(r"/tile_(\d+)_(\d+)$", name)
+                        if m:
+                            default_layer_conf["i"] = int(m.group(1))
+                            default_layer_conf["j"] = int(m.group(2))
+                            continue
+                    # leave unset if not derivable
+                    pass
         return default_layer_conf
 
     def change_obj_info(self, layer_name: str, obj_name: str) -> None:
@@ -519,6 +534,13 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
                     obj.delete_object()
                     layer = self.get_layer(conf[LAYER_NAME])
                     self.add_obj_image(conf[LAYER_NAME], conf["name"], layer[conf["name"]])
+                    # Recenter to keep view consistent after edits
+                    try:
+                        self.parentWidget().parent().to_the_map_corner()
+                        self.set_offset()
+                        self.scene_update()
+                    except Exception:
+                        pass
                 else:
                     self.parentWidget().parent().view_info_form("Error",
                                                                 "Invalid object configuration entered!")
@@ -558,7 +580,7 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
         tiles = self.get_layer(TILES)
         for tile_name in tiles:
             tile = tiles[tile_name]
-            if self.is_selected_tile(tile):
+            if self.is_selected_tile(tile, tile_name=tile_name):
                 args["tile_name"] = tile_name
                 args["tile"] = tile
                 handler_func(args)
@@ -600,6 +622,13 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
         self.handlers.handle(command=ChangeTypeCommand(TILES, tile_name,
                                                        new_tile_type))
         self.rotate_obj_on_map(tile_name, 0)
+        # Recenter view after tile change to avoid drifting offsets
+        try:
+            self.parentWidget().parent().to_the_map_corner()
+            self.set_offset()
+            self.scene_update()
+        except Exception:
+            pass
 
     def wheelEvent(self, event: QtGui.QWheelEvent) -> None:
         sf = 1.5 ** (event.angleDelta().y() / 240)
@@ -921,7 +950,7 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
         selected_tiles = []
         for tile_name in tiles:
             tile = tiles[tile_name]
-            if self.is_selected_tile(tile):
+            if self.is_selected_tile(tile, tile_name=tile_name):
                 selected_tiles.append(tile)
         return selected_tiles
 

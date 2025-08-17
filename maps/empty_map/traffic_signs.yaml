@@ -1,5 +1,0 @@
-traffic_signs:
-  map_1/traffic_sign1:
-    family: 36h11
-    id: 5
-    type: do_not_enter
