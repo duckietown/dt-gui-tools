@@ -217,7 +217,8 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
         if new_obj:
             frame_obj = self.get_frame_object(object_name)
             # Map stores yaw in radians; viewer uses degrees
-            self.rotate_obj(new_obj, math.degrees(frame_obj.pose.yaw))
+            # Invert display rotation: show opposite of stored yaw
+            self.rotate_obj(new_obj, -math.degrees(frame_obj.pose.yaw))
             coordinates = self.get_final_pos(object_name,
                                                  frame_obj.pose.x,
                                                  frame_obj.pose.y)
@@ -398,8 +399,10 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
     def rotate_with_button(self, args: Dict[str, Any]) -> None:
         tile_name = args["tile_name"]
         obj = self.get_image_object(tile_name)
-        self.rotate_obj(obj, obj.yaw + 90)
-        self.rotate_obj_on_map(tile_name, obj.yaw)
+        # Invert visual rotation: rotate sprite opposite to saved yaw
+        new_angle = obj.yaw - 90
+        self.rotate_obj(obj, -new_angle)
+        self.rotate_obj_on_map(tile_name, new_angle)
 
     def is_selected_tile(self, tile: Tile, is_dict: bool = False, tile_name: Optional[str] = None) -> bool:
         try:
