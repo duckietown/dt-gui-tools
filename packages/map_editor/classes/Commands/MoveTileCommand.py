@@ -14,5 +14,5 @@ class MoveTileCommand(Command):
     def execute(self, layer: MapLayer, layer_name: str, *args,
                 **kwargs) -> None:
         if layer_name == TILES:
-            layer[self._tile_name].i = self._new_position[0]
-            layer[self._tile_name].j = self._new_position[1]
+            # No longer persist i/j; indices are implied by tile name
+            pass

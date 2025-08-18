@@ -19,6 +19,7 @@ from typing import Dict, Any, List
 from pathlib import Path
 import os
 import shutil
+import yaml
 from utils.constants import REQUIRED_LAYERS, TILE_KIND, CTRL, \
     TRAFFIC_SIGNS_TYPES_IDS, VIEW_TILE_HEIGHT
 
@@ -227,6 +228,11 @@ class MapAPI:
                 self._ensure_map_base(save_dir)
                 self._ensure_vehicle_runtime_files(save_dir)
             self._map_storage.map.to_disk()
+            # Post-process: remove redundant i/j from tiles.yaml on disk
+            try:
+                self._strip_tile_indices(save_dir)
+            except Exception as e:
+                logging.warning(f"Could not strip tile indices: {e}")
             logging.info("Map saved successfully")
             print("[MapEditor] Map saved successfully")
         except Exception as e:
@@ -257,6 +263,26 @@ class MapAPI:
                 print(f"[MapEditor] Failed during Save As: {e}")
             return True
         return False
+
+    def _strip_tile_indices(self, directory: str) -> None:
+        """Remove i/j from tiles.yaml; indices are implied by tile name.
+
+        Keeps only the minimal fields (e.g., type) for each tile.
+        """
+        tiles_path = os.path.join(directory, "tiles.yaml")
+        if not os.path.isfile(tiles_path):
+            return
+        with open(tiles_path, "r", encoding="utf-8") as f:
+            data = yaml.safe_load(f) or {}
+        tiles = data.get("tiles", {})
+        if not isinstance(tiles, dict):
+            return
+        for tile_name, conf in list(tiles.items()):
+            if isinstance(conf, dict):
+                conf.pop("i", None)
+                conf.pop("j", None)
+        with open(tiles_path, "w", encoding="utf-8") as f:
+            yaml.safe_dump(data, f, sort_keys=False)
 
     #  Exit
     def exit_triggered(self, _translate, window: QtWidgets.QMainWindow) -> None:
