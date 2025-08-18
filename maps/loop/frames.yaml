@@ -56,7 +56,8 @@ frames:
       y: 1.0
       yaw: 0.0
       z: 0.0
-    relative_to: map_0
+    relative_to: null
+    unit: tiles
   map_0/tile_1_2:
     pose:
       pitch: 0.0

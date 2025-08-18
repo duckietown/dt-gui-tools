@@ -26,6 +26,8 @@ from classes.layers import BasicLayerHandler, DynamicLayer
 from classes.map_objects import DraggableImage, ImageObject
 from classes.MapDescription import MapDescription
 from typing import Dict, Any, Optional, Union, Tuple, List
+import os
+import yaml
 from coordinatesTransformer import CoordinatesTransformer
 from history import Memento
 from buffer import Buffer
@@ -71,6 +73,7 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
     grid_width: float = tile_width * grid_scale
     tile_map: str = "map_1"
     buffer: Buffer = None
+    _frame_units: Dict[str, str] = {}
 
     def __init__(self, work_dir: str) -> None:
         QtWidgets.QGraphicsView.__init__(self)
@@ -88,6 +91,11 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
                                                               self.tile_width,
                                                               self.tile_height)
         self.painter = Painter()
+        # Load units for default map
+        try:
+            self._load_frame_units(Path(f"{work_dir}/maps/empty_map"))
+        except Exception:
+            self._frame_units = {}
         self.init_all_map_objects()
         # Ensure vehicles (if any) have valid defaults (e.g., color)
         try:
@@ -97,6 +105,26 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
         self.set_map_size()
         self.setMouseTracking(True)
         self.buffer = Buffer()
+
+    def _load_frame_units(self, path: Path) -> None:
+        self._frame_units = {}
+        try:
+            frames_yaml_path = os.path.join(str(path), "frames.yaml")
+            if not os.path.exists(frames_yaml_path):
+                return
+            with open(frames_yaml_path, "r") as fh:
+                data = yaml.safe_load(fh) or {}
+            frames_dict = data.get("frames", {}) if isinstance(data, dict) else {}
+            for name, conf in frames_dict.items():
+                try:
+                    unit_val = conf.get("unit", None)
+                    if isinstance(unit_val, str) and unit_val:
+                        self._frame_units[name] = unit_val
+                except Exception:
+                    continue
+        except Exception:
+            # best-effort parsing; missing or invalid YAML leaves units empty
+            self._frame_units = {}
 
     def init_all_map_objects(self) -> None:
         frames = self.get_layer("frames")
@@ -235,11 +263,75 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
         self.change_object_handler(self.scaled_obj, {"scale": self.scale})
 
     def get_final_pos(self, frame_name: str, x: float, y: float) -> Tuple[float, float]:
+        def _extract_pose_and_unit(obj) -> Tuple[float, float, Optional[str]]:
+            unit_value = None
+            px = 0.0
+            py = 0.0
+            # typed object path
+            try:
+                unit_value = getattr(obj, "unit", None)
+            except Exception:
+                unit_value = None
+            try:
+                px = obj.pose.x
+                py = obj.pose.y
+                # override from file-based cache when available
+                try:
+                    cached_unit = self._frame_units.get(frame_name)
+                    if cached_unit is not None:
+                        unit_value = cached_unit
+                except Exception:
+                    pass
+                return px, py, unit_value
+            except Exception:
+                pass
+            # dict path
+            try:
+                unit_value = obj.get("unit", unit_value)
+                pose = obj.get("pose", {})
+                px = pose.get("x", 0.0)
+                py = pose.get("y", 0.0)
+            except Exception:
+                px, py = 0.0, 0.0
+            # override from file-based cache when available
+            try:
+                cached_unit = self._frame_units.get(frame_name)
+                if cached_unit is not None:
+                    unit_value = cached_unit
+            except Exception:
+                pass
+            return px, py, unit_value
+
+        def _scale_xy_by_unit(px: float, py: float, unit_value: Optional[str]) -> Tuple[float, float]:
+            if isinstance(unit_value, str) and unit_value.lower() == "tiles":
+                return px * self.tile_width, py * self.tile_height
+            return px, py
+
         frames = self.get_layer("frames")
-        frame_obj = frames[frame_name]
+        # start from this frame's pose, respecting its unit
+        try:
+            start_obj = frames[frame_name]
+        except Exception:
+            start_obj = None
+        if start_obj is not None:
+            sx, sy, sunit = _extract_pose_and_unit(start_obj)
+            # Only scale when unit explicitly equals 'tiles'. Otherwise, use values as-is.
+            x_total, y_total = _scale_xy_by_unit(sx, sy, sunit)
+        else:
+            x_total, y_total = x, y
         # Walk up the frame tree safely until we reach the map root
-        while True:
-            parent = getattr(frame_obj, "relative_to", None)
+        frame_obj = start_obj
+        while frame_obj is not None:
+            parent = None
+            try:
+                parent = getattr(frame_obj, "relative_to", None)
+            except Exception:
+                pass
+            if parent is None:
+                try:
+                    parent = frame_obj.get("relative_to", None)
+                except Exception:
+                    parent = None
             # stop if parent is missing/empty or already at map root
             if not parent or parent == self.tile_map:
                 break
@@ -248,9 +340,11 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
                 frame_obj = frames[parent]
             except Exception:
                 break
-            x += frame_obj.pose.x
-            y += frame_obj.pose.y
-        return x, y
+            px, py, punit = _extract_pose_and_unit(frame_obj)
+            px, py = _scale_xy_by_unit(px, py, punit)
+            x_total += px
+            y_total += py
+        return x_total, y_total
 
     def get_relative_map_pos(self, frame_name: str,
                              new_qt_pos: Tuple[float, float],
@@ -872,6 +966,11 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
         self.parentWidget().parent().clear_editor_history()
         self.map.load_map(MapDescription(path, map_name))
         self.init_handlers()
+        # refresh frame units from the just-opened map directory
+        try:
+            self._load_frame_units(path)
+        except Exception:
+            self._frame_units = {}
         if is_new_map:
             self.create_default_map_content(size, tile_size, default_fill)
         else:
