@@ -23,7 +23,7 @@ frames:
       roll: 0.0
       x: 0.0
       y: 0.0
-      yaw: 3.673205102942786e-06
+      yaw: 4.712385307179587
       z: 0.0
     relative_to: map_1
   map_1/tile_0_1:
@@ -86,7 +86,7 @@ frames:
       roll: 0.0
       x: 0.585
       y: 1.17
-      yaw: 1.5707963267948966
+      yaw: 1.5708
       z: 0.0
     relative_to: map_1
   map_1/tile_1_3:
@@ -140,7 +140,7 @@ frames:
       roll: 0.0
       x: 1.17
       y: 1.755
-      yaw: 4.71238898038469
+      yaw: 4.71239
       z: 0.0
     relative_to: map_1
   map_1/tile_2_4:
@@ -240,5 +240,14 @@ frames:
       x: 2.34
       y: 2.34
       yaw: 1.5707963267948966
+      z: 0.0
+    relative_to: map_1
+  map_1/vehicle_1:
+    pose:
+      pitch: 0.0
+      roll: 0.0
+      x: 1.4719300000000002
+      y: 0.8574340336134453
+      yaw: 0.0
       z: 0.0
     relative_to: map_1

@@ -33,7 +33,7 @@ from history import Memento
 from buffer import Buffer
 from painter import Painter
 from utils.maps import default_map_storage, get_map_height, get_map_width, \
-    change_map_name, convert_layer_name_to_class_name
+    change_map_name, convert_layer_name_to_class_name, create_layer, set_obj
 from utils.constants import LAYERS_WITH_TYPES, OBJECTS_TYPES, FRAMES, FRAME, \
     TILES, TILE_MAPS, TILE_SIZE, NOT_DRAGGABLE, LAYER_NAME, NEW_CONFIG, \
     KNOWN_LAYERS, WATCHTOWERS, VEHICLES, TRAFFIC_SIGNS
@@ -211,11 +211,117 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
         self.add_obj_image(layer_name, object_name, item_name=item_name)
         self.scaled_obj(self.get_image_object(object_name),
                         {'scale': self.scale})
+        # If a vehicle is added, create its auxiliary components in other layers
+        if layer_name == VEHICLES:
+            try:
+                self._ensure_vehicle_components(object_name)
+            except Exception:
+                # Best-effort; avoid blocking editor on auxiliary creation
+                pass
+
+    def _ensure_layer(self, layer_name: str) -> None:
+        # Create layer in the underlying Map if missing
+        dm = self.map.map
+        if not hasattr(dm.layers, layer_name):
+            try:
+                create_layer(dm, layer_name, {})
+            except Exception:
+                pass
+
+    def _ensure_vehicle_components(self, vehicle_name: str) -> None:
+        dm = self.map.map
+        # Wheels
+        self._ensure_layer("wheels")
+        wheels_conf = {
+            f"{vehicle_name}/wheel_left": {"encoder": {"resolution": 135}, "radius": 0.0318},
+            f"{vehicle_name}/wheel_right": {"encoder": {"resolution": 135}, "radius": 0.0318},
+        }
+        for full_name, conf in wheels_conf.items():
+            try:
+                set_obj(dm.layers["wheels"], full_name, conf)
+            except Exception:
+                pass
+        # Vehicle dynamics
+        self._ensure_layer("vehicle_dynamics")
+        dynamics_conf = {
+            vehicle_name: {"commands_delay": 0.0, "motor_constant_left": 27.0, "motor_constant_right": 27.0}
+        }
+        for full_name, conf in dynamics_conf.items():
+            try:
+                set_obj(dm.layers["vehicle_dynamics"], full_name, conf)
+            except Exception:
+                pass
+        # Time of flights
+        self._ensure_layer("time_of_flights")
+        tof_conf = {
+            f"{vehicle_name}/tof_front_center": {"angle": 0.4363, "frequency": 15, "maximum_distance": 1.2, "name": "front_center"}
+        }
+        for full_name, conf in tof_conf.items():
+            try:
+                set_obj(dm.layers["time_of_flights"], full_name, conf)
+            except Exception:
+                pass
+        # Vehicle tags
+        self._ensure_layer("vehicle_tags")
+        tags_conf = {
+            f"{vehicle_name}/tag": {"family": "36h11", "id": 403, "name": "top", "size": 0.08}
+        }
+        for full_name, conf in tags_conf.items():
+            try:
+                set_obj(dm.layers["vehicle_tags"], full_name, conf)
+            except Exception:
+                pass
+        # Lights
+        self._ensure_layer("lights")
+        lights_conf = {
+            f"{vehicle_name}/light_0": {"angle": 0.0, "color": "#ffffff", "intensity": 0.6, "name": "front_left", "range": 2.0, "type": "spot"},
+            f"{vehicle_name}/light_1": {"angle": 0.0, "color": "#ffffff", "intensity": 0.6, "name": "front_right", "range": 2.0, "type": "spot"},
+            f"{vehicle_name}/light_2": {"angle": 0.0, "color": "#f00000", "intensity": 0.6, "name": "back_left", "range": 2.0, "type": "spot"},
+            f"{vehicle_name}/light_3": {"angle": 0.0, "color": "#f00000", "intensity": 0.6, "name": "back_right", "range": 2.0, "type": "spot"},
+        }
+        for full_name, conf in lights_conf.items():
+            try:
+                set_obj(dm.layers["lights"], full_name, conf)
+            except Exception:
+                pass
+        # Cameras (use default intrinsic parameters from template)
+        self._ensure_layer("cameras")
+        camera_conf = {
+            f"{vehicle_name}/camera_0": {
+                "camera_matrix": [[294.53932068591484, 0.0, 309.40712721751646], [0.0, 296.5367154664796, 228.72814869651435], [0.0, 0.0, 1.0]],
+                "distortion_parameters": [-0.22642034632167934, 0.032424830545866784, -0.0030997885368560392, 0.00026050478624311846, 0.0],
+                "frame_rate": 30, "height": 480, "name": "front_center", "width": 640
+            }
+        }
+        for full_name, conf in camera_conf.items():
+            try:
+                set_obj(dm.layers["cameras"], full_name, conf)
+            except Exception:
+                pass
+        # Renderer assignments: ensure vehicle is rendered
+        try:
+            self._ensure_layer("renderer_assignments")
+            ra_layer = dm.layers["renderer_assignments"]
+            # simple structure: renderer_0.entities: [...]
+            if "renderer_0" not in ra_layer:
+                set_obj(ra_layer, "renderer_0", {"entities": []})
+            try:
+                entities = ra_layer["renderer_0"]["entities"]
+            except Exception:
+                entities = []
+            if vehicle_name not in entities:
+                entities.append(vehicle_name)
+                set_obj(ra_layer, "renderer_0", {"entities": entities})
+        except Exception:
+            pass
 
     def generate_object_name_and_id(self, map_name: str, layer_name: str) -> Tuple[str, int]:
         i = 1
         while True:
-            object_name: str = f"{map_name}/{layer_name[:-1]}{i}"
+            if layer_name == VEHICLES:
+                object_name = f"{map_name}/vehicle_{i}"
+            else:
+                object_name = f"{map_name}/{layer_name[:-1]}{i}"
             if object_name not in self.objects:
                 break
             i += 1

@@ -1,1 +1,5 @@
-vehicles: {}
+vehicles:
+  map_1/vehicle_1:
+    color: blue
+    configuration: DB21J
+    id: '1'

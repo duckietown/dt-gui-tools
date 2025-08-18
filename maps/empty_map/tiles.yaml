@@ -26,11 +26,11 @@ tiles:
   map_1/tile_1_1:
     i: 1
     j: 1
-    type: straight
+    type: 3way
   map_1/tile_1_2:
     i: 1
     j: 2
-    type: 3way
+    type: asphalt
   map_1/tile_1_3:
     i: 1
     j: 3
@@ -50,11 +50,11 @@ tiles:
   map_1/tile_2_2:
     i: 2
     j: 2
-    type: 3way
+    type: asphalt
   map_1/tile_2_3:
     i: 2
     j: 3
-    type: 3way
+    type: asphalt
   map_1/tile_2_4:
     i: 2
     j: 4
