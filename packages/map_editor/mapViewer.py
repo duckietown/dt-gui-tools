@@ -318,10 +318,8 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
     def generate_object_name_and_id(self, map_name: str, layer_name: str) -> Tuple[str, int]:
         i = 1
         while True:
-            if layer_name == VEHICLES:
-                object_name = f"{map_name}/vehicle_{i}"
-            else:
-                object_name = f"{map_name}/{layer_name[:-1]}{i}"
+            # Standardize naming to singular + _{i}. Tiles are named elsewhere as tile_i_j
+            object_name = f"{map_name}/{layer_name[:-1]}_{i}"
             if object_name not in self.objects:
                 break
             i += 1
@@ -356,6 +354,13 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
             coordinates = self.get_final_pos(object_name,
                                                  frame_obj.pose.x,
                                                  frame_obj.pose.y)
+            # For non-tile objects (e.g., vehicles/signs), shift by half-tile so (0,0)
+            # corresponds to tile center in the Duckiematrix convention
+            if new_obj.layer_name != TILES:
+                coordinates = (
+                    coordinates[0] - (self.tile_width / 2.0),
+                    coordinates[1] - (self.tile_height / 2.0),
+                )
             view_coordinates = (
                 self.get_x_to_view(coordinates[0], new_obj.width()),
                 self.get_y_to_view(coordinates[1]), new_obj.height()
@@ -581,6 +586,12 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
         frame_obj_coord = self.get_frame_object(obj.name)["pose"]
         view_coord = self.get_final_pos(obj.name, frame_obj_coord["x"],
                                         frame_obj_coord["y"])
+        # Align non-tile objects to Duckiematrix tile-center convention
+        if obj.layer_name != TILES:
+            view_coord = (
+                view_coord[0] + (self.tile_width / 2.0),
+                view_coord[1] + (self.tile_height / 2.0),
+            )
         new_coordinates = (
             self.get_x_to_view(
                 view_coord[0], obj_width) + self.offset_x,

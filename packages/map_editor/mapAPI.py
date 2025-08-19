@@ -99,25 +99,34 @@ class MapAPI:
             logging.exception(f"Failed to ensure map base in {target_dir}: {e}")
 
     def _ensure_vehicle_runtime_files(self, target_dir: str) -> None:
-        """If vehicles are present in the map, ensure needed runtime YAMLs exist
-        and main.yaml includes vehicles and cameras.
+        """If vehicles or traffic signs are present, ensure needed runtime YAMLs exist
+        and main.yaml includes vehicles, cameras, and traffic_signs.
 
         Files copied from template loop map if missing:
         - vehicles.yaml, cameras.yaml, vehicle_dynamics.yaml, wheels.yaml,
           vehicle_tags.yaml, renderer_mode.yaml, renderer_assignments.yaml,
-          rendering_configuration.yaml, lights.yaml, time_of_flights.yaml
+          rendering_configuration.yaml, lights.yaml, time_of_flights.yaml,
+          traffic_signs.yaml
         """
         try:
-            # detect vehicles layer presence
+            # detect vehicles/signs layer presence
             dm = self._map_storage.map
             has_vehicles = False
+            has_signs = False
             try:
                 vehicles_layer = dm.layers.vehicles
                 has_vehicles = len(list(vehicles_layer.items())) > 0
             except Exception:
                 has_vehicles = False
-            # also consider existing vehicles.yaml in target_dir
-            if not has_vehicles and not os.path.isfile(os.path.join(target_dir, "vehicles.yaml")):
+            try:
+                signs_layer = dm.layers.traffic_signs
+                has_signs = len(list(signs_layer.items())) > 0
+            except Exception:
+                has_signs = False
+            # also consider existing YAMLs in target_dir
+            vehicles_yaml_exists = os.path.isfile(os.path.join(target_dir, "vehicles.yaml"))
+            traffic_signs_yaml_exists = os.path.isfile(os.path.join(target_dir, "traffic_signs.yaml"))
+            if not has_vehicles and not vehicles_yaml_exists and not has_signs and not traffic_signs_yaml_exists:
                 return
             template_dir = Path(__file__).resolve().parents[2] / "maps" / "loop"
             needed = [
@@ -131,6 +140,7 @@ class MapAPI:
                 "rendering_configuration.yaml",
                 "lights.yaml",
                 "time_of_flights.yaml",
+                "traffic_signs.yaml",
             ]
             for fname in needed:
                 dst = os.path.join(target_dir, fname)
@@ -138,7 +148,16 @@ class MapAPI:
                     src = template_dir / fname
                     if os.path.isfile(src):
                         shutil.copyfile(str(src), dst)
-            # ensure main.yaml includes vehicles and cameras
+                    else:
+                        # create minimal file if template missing
+                        with open(dst, "w", encoding="utf-8") as f:
+                            if fname.endswith("traffic_signs.yaml"):
+                                f.write("traffic_signs:\n")
+                            elif fname.endswith("vehicles.yaml"):
+                                f.write("vehicles:\n")
+                            else:
+                                f.write("")
+            # ensure main.yaml includes vehicles, cameras, traffic_signs
             main_yaml_path = os.path.join(target_dir, "main.yaml")
             if os.path.isfile(main_yaml_path):
                 with open(main_yaml_path, "r", encoding="utf-8") as f:
@@ -148,6 +167,8 @@ class MapAPI:
                     lines_to_add.append("  vehicles: !include \"vehicles.yaml\"\n")
                 if "cameras: !include \"cameras.yaml\"" not in content:
                     lines_to_add.append("  cameras: !include \"cameras.yaml\"\n")
+                if "traffic_signs: !include \"traffic_signs.yaml\"" not in content:
+                    lines_to_add.append("  traffic_signs: !include \"traffic_signs.yaml\"\n")
                 if lines_to_add:
                     if content.endswith("\n"):
                         content += "".join(lines_to_add)
@@ -156,7 +177,7 @@ class MapAPI:
                     with open(main_yaml_path, "w", encoding="utf-8") as f:
                         f.write(content)
         except Exception as e:
-            logging.exception(f"Failed to ensure vehicle runtime files in {target_dir}: {e}")
+            logging.exception(f"Failed to ensure vehicle/sign runtime files in {target_dir}: {e}")
 
     #  Open map
     def create_map_triggered(self, info: Dict[str, Any]) -> None:

@@ -242,12 +242,57 @@ frames:
       yaw: 1.5707963267948966
       z: 0.0
     relative_to: map_1
+  map_1/traffic_sign1:
+    pose:
+      pitch: 0.0
+      roll: 0.0
+      x: 1.17
+      y: 1.17
+      yaw: 0.0
+      z: 0.0
+    relative_to: map_1
+  map_1/traffic_sign2:
+    pose:
+      pitch: 0.0
+      roll: 0.0
+      x: 0.2925
+      y: 0.2925
+      yaw: 0.0
+      z: 0.0
+    relative_to: map_1
+  map_1/traffic_sign3:
+    pose:
+      pitch: 0.0
+      roll: 0.0
+      x: 0.585
+      y: 0.585
+      yaw: 0.0
+      z: 0.0
+    relative_to: map_1
+  map_1/traffic_sign4:
+    pose:
+      pitch: 0.0
+      roll: 0.0
+      x: -0.2925
+      y: -0.2925
+      yaw: 1.5707963267948966
+      z: 0.0
+    relative_to: map_1
+  map_1/traffic_sign5:
+    pose:
+      pitch: 0.0
+      roll: 0.0
+      x: 0.0
+      y: 0.0
+      yaw: 0.0
+      z: 0.0
+    relative_to: map_1
   map_1/vehicle_1:
     pose:
       pitch: 0.0
       roll: 0.0
-      x: 1.4719300000000002
-      y: 0.8574340336134453
+      x: 1.4817619327731093
+      y: 0.8082743697478992
       yaw: 0.0
       z: 0.0
     relative_to: map_1

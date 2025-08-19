@@ -1,1 +1,21 @@
-traffic_signs: {}
+traffic_signs:
+  map_1/traffic_sign1:
+    family: 36h11
+    id: 20
+    type: stop
+  map_1/traffic_sign2:
+    family: 36h11
+    id: 5
+    type: do_not_enter
+  map_1/traffic_sign3:
+    family: 36h11
+    id: 2
+    type: yield
+  map_1/traffic_sign4:
+    family: 36h11
+    id: 21
+    type: stop
+  map_1/traffic_sign5:
+    family: 36h11
+    id: 22
+    type: stop
