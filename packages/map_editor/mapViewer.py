@@ -616,8 +616,8 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
         tile_name = args["tile_name"]
         obj = self.get_image_object(tile_name)
         # Invert visual rotation: rotate sprite opposite to saved yaw
-        new_angle = obj.yaw - 90
-        self.rotate_obj(obj, -new_angle)
+        new_angle = obj.yaw + 90
+        self.rotate_obj(obj, new_angle)
         self.rotate_obj_on_map(tile_name, new_angle)
 
     def is_selected_tile(self, tile: Tile, is_dict: bool = False, tile_name: Optional[str] = None) -> bool:

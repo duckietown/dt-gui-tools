@@ -2,16 +2,16 @@ traffic_signs:
   map_1/traffic_sign_1:
     family: 36h11
     id: 20
-    type: sign_stop
+    type: stop
   map_1/traffic_sign_2:
     family: 36h11
     id: 21
-    type: sign_stop
+    type: stop
   map_1/traffic_sign_3:
     family: 36h11
     id: 22
-    type: sign_stop
+    type: stop
   map_1/traffic_sign_4:
     family: 36h11
     id: 23
-    type: sign_stop
+    type: stop
