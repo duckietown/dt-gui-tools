@@ -249,6 +249,10 @@ class MapAPI:
                 self._ensure_map_base(save_dir)
                 self._ensure_vehicle_runtime_files(save_dir)
             self._map_storage.map.to_disk()
+            try:
+                self._prefix_sign_types(save_dir)
+            except Exception as e:
+                logging.warning(f"Could not prefix traffic sign types: {e}")
             # Post-process: remove redundant i/j from tiles.yaml on disk
             try:
                 self._strip_tile_indices(save_dir)
@@ -304,6 +308,30 @@ class MapAPI:
                 conf.pop("j", None)
         with open(tiles_path, "w", encoding="utf-8") as f:
             yaml.safe_dump(data, f, sort_keys=False)
+
+    def _prefix_sign_types(self, directory: str) -> None:
+        """Update traffic_signs types to sign_{type} for Duckiematrix consumption."""
+        ts_path = os.path.join(directory, "traffic_signs.yaml")
+        if not os.path.isfile(ts_path):
+            return
+        with open(ts_path, "r", encoding="utf-8") as f:
+            data = yaml.safe_load(f) or {}
+        signs = data.get("traffic_signs", {})
+        if not isinstance(signs, dict):
+            return
+        updated = False
+        for name, conf in list(signs.items()):
+            if not isinstance(conf, dict):
+                continue
+            t = conf.get("type", None)
+            if isinstance(t, str) and not t.startswith("sign_"):
+                conf["type"] = f"sign_{t}"
+                signs[name] = conf
+                updated = True
+        if updated:
+            data["traffic_signs"] = signs
+            with open(ts_path, "w", encoding="utf-8") as f:
+                yaml.safe_dump(data, f, sort_keys=False)
 
     #  Exit
     def exit_triggered(self, _translate, window: QtWidgets.QMainWindow) -> None:

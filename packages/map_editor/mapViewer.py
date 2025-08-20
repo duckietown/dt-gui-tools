@@ -318,8 +318,13 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
     def generate_object_name_and_id(self, map_name: str, layer_name: str) -> Tuple[str, int]:
         i = 1
         while True:
-            # Standardize naming to singular + _{i}. Tiles are named elsewhere as tile_i_j
-            object_name = f"{map_name}/{layer_name[:-1]}_{i}"
+            # Standardize naming to singular + _{i} for non-tiles.
+            # Special case: citizens should be named 'duckie_{i}' in the matrix.
+            if layer_name == 'citizens':
+                singular = 'duckie'
+            else:
+                singular = layer_name[:-1]
+            object_name = f"{map_name}/{singular}_{i}"
             if object_name not in self.objects:
                 break
             i += 1

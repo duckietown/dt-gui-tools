@@ -5,3 +5,4 @@ main:
   tile_maps: !include "tile_maps.yaml"
   vehicles: !include "vehicles.yaml"
   cameras: !include "cameras.yaml"
+  traffic_signs: !include "traffic_signs.yaml"
