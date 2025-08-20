@@ -33,9 +33,8 @@ class DuckWindow(QtWidgets.QMainWindow):
 
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        # Fun touch: add a duck emoji to the window title
         try:
-            self.setWindowTitle("🦆 Map Editor")
+            self.setWindowTitle("Map Editor (Alpha)")
         except Exception:
             pass
         # necessary in docker (otherwise Permission denied error for saving map)
