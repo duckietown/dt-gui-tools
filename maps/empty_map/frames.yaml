@@ -17,22 +17,13 @@ frames:
       yaw: 0.0
       z: 0.0
     relative_to: ''
-  map_1/duckie_1:
-    pose:
-      pitch: 0.0
-      roll: 0.0
-      x: 1.167142857142857
-      y: 0.5772268907563025
-      yaw: 0.0
-      z: 0.0
-    relative_to: map_1
   map_1/tile_0_0:
     pose:
       pitch: 0.0
       roll: 0.0
       x: 0.0
       y: 0.0
-      yaw: 4.712385307179587
+      yaw: 6.28319
       z: 0.0
     relative_to: map_1
   map_1/tile_0_1:
@@ -68,7 +59,7 @@ frames:
       roll: 0.0
       x: 0.0
       y: 2.34
-      yaw: 3.141592653589793
+      yaw: 6.28319
       z: 0.0
     relative_to: map_1
   map_1/tile_1_0:
@@ -104,7 +95,7 @@ frames:
       roll: 0.0
       x: 0.585
       y: 1.755
-      yaw: 3.141592653589793
+      yaw: 6.28319
       z: 0.0
     relative_to: map_1
   map_1/tile_1_4:
@@ -248,42 +239,6 @@ frames:
       roll: 0.0
       x: 2.34
       y: 2.34
-      yaw: 1.5707963267948966
-      z: 0.0
-    relative_to: map_1
-  map_1/traffic_sign_1:
-    pose:
-      pitch: 0.0
-      roll: 0.0
-      x: 1.4719327731092438
-      y: 1.4621008403361349
-      yaw: 0.0
-      z: 0.0
-    relative_to: map_1
-  map_1/traffic_sign_2:
-    pose:
-      pitch: 0.0
-      roll: 0.0
-      x: 0.8820168067226891
-      y: 1.4621008403361344
-      yaw: -1.5707963267948966
-      z: 0.0
-    relative_to: map_1
-  map_1/traffic_sign_3:
-    pose:
-      pitch: 0.0
-      roll: 0.0
-      x: 0.8918487394957983
-      y: 0.882016806722689
-      yaw: 3.141592653589793
-      z: 0.0
-    relative_to: map_1
-  map_1/traffic_sign_4:
-    pose:
-      pitch: 0.0
-      roll: 0.0
-      x: 1.4621008403361344
-      y: 0.882016806722689
-      yaw: 1.5707963267948966
+      yaw: 6.28319
       z: 0.0
     relative_to: map_1

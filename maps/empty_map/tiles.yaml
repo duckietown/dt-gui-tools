@@ -1,6 +1,6 @@
 tiles:
   map_1/tile_0_0:
-    type: curve
+    type: asphalt
   map_1/tile_0_1:
     type: asphalt
   map_1/tile_0_2:
@@ -8,15 +8,15 @@ tiles:
   map_1/tile_0_3:
     type: asphalt
   map_1/tile_0_4:
-    type: curve
+    type: asphalt
   map_1/tile_1_0:
     type: asphalt
   map_1/tile_1_1:
-    type: 3way
+    type: asphalt
   map_1/tile_1_2:
     type: asphalt
   map_1/tile_1_3:
-    type: 3way
+    type: asphalt
   map_1/tile_1_4:
     type: asphalt
   map_1/tile_2_0:
@@ -34,13 +34,13 @@ tiles:
   map_1/tile_3_1:
     type: asphalt
   map_1/tile_3_2:
-    type: straight
+    type: asphalt
   map_1/tile_3_3:
-    type: straight
+    type: asphalt
   map_1/tile_3_4:
     type: asphalt
   map_1/tile_4_0:
-    type: curve
+    type: asphalt
   map_1/tile_4_1:
     type: asphalt
   map_1/tile_4_2:
@@ -48,4 +48,4 @@ tiles:
   map_1/tile_4_3:
     type: asphalt
   map_1/tile_4_4:
-    type: curve
+    type: asphalt
