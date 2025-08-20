@@ -68,7 +68,6 @@ py-multibase==1.0.3
 py-multicodec==0.2.1
 py-multihash==0.2.3
 pycparser==2.22
-pygame==1.9.6
 pyglet==2.0.15
 pyrender==0.1.45
 python-apt==2.0.1+ubuntu0.20.4.1
