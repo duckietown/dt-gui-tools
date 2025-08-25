@@ -54,3 +54,5 @@ libgl1
 libsm6
 libxrender1
 libfontconfig1
+
+libgirepository1.0-dev
