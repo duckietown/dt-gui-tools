@@ -1,0 +1,29 @@
+lights:
+  map_0/vehicle_0/light_0:
+    angle: 0.0
+    color: '#ffffff'
+    intensity: 0.6
+    name: front_left
+    range: 2.0
+    type: spot
+  map_0/vehicle_0/light_1:
+    angle: 0.0
+    color: '#ffffff'
+    intensity: 0.6
+    name: front_right
+    range: 2.0
+    type: spot
+  map_0/vehicle_0/light_2:
+    angle: 0.0
+    color: '#f00000'
+    intensity: 0.6
+    name: back_left
+    range: 2.0
+    type: spot
+  map_0/vehicle_0/light_3:
+    angle: 0.0
+    color: '#f00000'
+    intensity: 0.6
+    name: back_right
+    range: 2.0
+    type: spot

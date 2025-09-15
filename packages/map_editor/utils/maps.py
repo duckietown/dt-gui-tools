@@ -6,11 +6,21 @@ from mapStorage import MapStorage
 from dt_maps import Map, MapLayer
 from typing import Dict, Any
 from dt_maps.Map import REGISTER
+import re
 
 
 def copy_dir_with_map(path_from: str, path_to: str) -> None:
     if not os.path.exists(path_to):
         shutil.copytree(path_from, path_to)
+        # Remove optional layers that should not be present by default
+        # Vehicles and cameras are added only when the user creates them
+        for optional in ("vehicles.yaml", "cameras.yaml"):
+            opt_path = os.path.join(path_to, optional)
+            if os.path.exists(opt_path):
+                try:
+                    os.remove(opt_path)
+                except OSError:
+                    pass
 
 
 def default_map_storage(map_dir: str) -> MapStorage:
@@ -53,7 +63,20 @@ def get_map_width(tiles: Dict[str, Any]) -> int:
 def get_map_size(tiles: Dict[str, Any], side: str) -> int:
     elems = []
     for tile_name in tiles:
-        elems.append(tiles[tile_name][side])
+        try:
+            elems.append(tiles[tile_name][side])
+            continue
+        except Exception:
+            pass
+        # Fallback: derive i/j from tile name like .../tile_3_2
+        m = re.search(r"/tile_(\d+)_(\d+)$", tile_name)
+        if m:
+            i_val = int(m.group(1))
+            j_val = int(m.group(2))
+            elems.append(i_val if side == "i" else j_val)
+            continue
+        # If we cannot derive, skip
+        continue
     if len(elems) > 0:
         return max(elems) + 1
     else:

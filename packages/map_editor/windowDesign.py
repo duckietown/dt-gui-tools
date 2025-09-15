@@ -385,7 +385,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "Map Builder"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Map Editor"))
         self.file.setTitle(_translate("MainWindow", "File"))
 
         # TODO future functionality

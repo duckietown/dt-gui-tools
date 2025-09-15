@@ -1,0 +1,5 @@
+renderer_assignments:
+  renderer_0:
+    entities:
+    - map_1/vehicle1
+    - map_1/vehicle_1

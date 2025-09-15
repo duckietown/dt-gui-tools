@@ -1,6 +1,7 @@
 import functools
 import json
 import codecs
+import logging
 from PyQt5.QtGui import QResizeEvent, QKeyEvent, QMouseEvent
 from history import Memento
 from mapAPI import MapAPI
@@ -32,6 +33,10 @@ class DuckWindow(QtWidgets.QMainWindow):
 
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        try:
+            self.setWindowTitle("Map Editor (Alpha)")
+        except Exception:
+            pass
         # necessary in docker (otherwise Permission denied error for saving map)
         copy_dir_with_map("./maps/empty_map", f"{args.wkdir}/maps/empty_map")
         self.map_viewer = MapViewer(args.wkdir)
@@ -189,10 +194,14 @@ class DuckWindow(QtWidgets.QMainWindow):
 
     #  Save map
     def save_map_triggered(self):
+        logging.info("Save button pressed")
+        print("[MapEditor] Save button pressed")
         self.map_api.save_map_triggered()
 
     #  Save map as
     def save_map_as_triggered(self):
+        logging.info("Save As button pressed")
+        print("[MapEditor] Save As button pressed")
         self.map_api.save_map_as_triggered(self)
 
     #  Calculate map characteristics

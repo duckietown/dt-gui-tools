@@ -658,5 +658,5 @@
             "icon": "img/objects/ground_tags.png"
         }
     },
-    "description": "Moving map: Ctrl + LMB or Middle button\n\nEdit object: RMB on object\n\nHighlight area: LMB\n\nMove object: LMB on object and hold\n\nSelect tile type in left menu: Single click\n\nSelect object in left menu: Double click"
+    "description": "Rotate tiles/objects: Ctrl + R\n\nMoving map: Ctrl + LMB or Middle button\n\nEdit object: RMB on object\n\nHighlight area: LMB\n\nMove object: LMB on object and hold\n\nSelect tile type in left menu: Single click\n\nSelect object in left menu: Double click"
 }

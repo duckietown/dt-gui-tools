@@ -19,6 +19,7 @@ from typing import Dict, Any, List
 from pathlib import Path
 import os
 import shutil
+import yaml
 from utils.constants import REQUIRED_LAYERS, TILE_KIND, CTRL, \
     TRAFFIC_SIGNS_TYPES_IDS, VIEW_TILE_HEIGHT
 
@@ -68,6 +69,120 @@ class MapAPI:
         self.init_info_form.show()
         self.set_move_mode(False)
 
+    def _ensure_map_base(self, target_dir: str) -> None:
+        """Ensure a usable Duckiematrix map base: main.yaml and assets/.
+
+        - Creates main.yaml if missing
+        - Copies template assets/ if missing
+        """
+        try:
+            # 1) main.yaml
+            main_yaml_path = os.path.join(target_dir, "main.yaml")
+            # Always write a minimal, Duckiematrix-compatible main.yaml
+            main_yaml_content = (
+                "version: 1.0\n"
+                "main:\n"
+                "  frames: !include \"frames.yaml\"\n"
+                "  tiles: !include \"tiles.yaml\"\n"
+                "  tile_maps: !include \"tile_maps.yaml\"\n"
+            )
+            with open(main_yaml_path, "w", encoding="utf-8") as f:
+                f.write(main_yaml_content)
+            # 2) assets/
+            assets_dir = os.path.join(target_dir, "assets")
+            if not os.path.isdir(assets_dir):
+                # template assets live under dt-gui-tools/maps/empty_map/assets
+                template_assets = Path(__file__).resolve().parents[2] / "maps" / "empty_map" / "assets"
+                if os.path.isdir(template_assets):
+                    shutil.copytree(str(template_assets), assets_dir)
+        except Exception as e:
+            logging.exception(f"Failed to ensure map base in {target_dir}: {e}")
+
+    # ###### DT_MAPS COMPATIBILITY: runtime file ensures and includes ######
+    # Helper to ensure auxiliary YAMLs (vehicles, cameras, signs) and main.yaml includes.
+    # Keep until schemas converge; safe to simplify/remove when dt_maps handles this natively.
+    def _ensure_vehicle_runtime_files(self, target_dir: str) -> None:
+        """If vehicles or traffic signs are present, ensure needed runtime YAMLs exist
+        and main.yaml includes vehicles, cameras, and traffic_signs.
+
+        Files copied from template loop map if missing:
+        - vehicles.yaml, cameras.yaml, vehicle_dynamics.yaml, wheels.yaml,
+          vehicle_tags.yaml, renderer_mode.yaml, renderer_assignments.yaml,
+          rendering_configuration.yaml, lights.yaml, time_of_flights.yaml,
+          traffic_signs.yaml
+        """
+        try:
+            # detect vehicles/signs layer presence
+            dm = self._map_storage.map
+            has_vehicles = False
+            has_signs = False
+            try:
+                vehicles_layer = dm.layers.vehicles
+                has_vehicles = len(list(vehicles_layer.items())) > 0
+            except Exception:
+                has_vehicles = False
+            try:
+                signs_layer = dm.layers.traffic_signs
+                has_signs = len(list(signs_layer.items())) > 0
+            except Exception:
+                has_signs = False
+            # also consider existing YAMLs in target_dir
+            vehicles_yaml_exists = os.path.isfile(os.path.join(target_dir, "vehicles.yaml"))
+            traffic_signs_yaml_exists = os.path.isfile(os.path.join(target_dir, "traffic_signs.yaml"))
+            if not has_vehicles and not vehicles_yaml_exists and not has_signs and not traffic_signs_yaml_exists:
+                return
+            template_dir = Path(__file__).resolve().parents[2] / "maps" / "loop"
+            needed = [
+                "vehicles.yaml",
+                "cameras.yaml",
+                "vehicle_dynamics.yaml",
+                "wheels.yaml",
+                "vehicle_tags.yaml",
+                "renderer_mode.yaml",
+                "renderer_assignments.yaml",
+                "rendering_configuration.yaml",
+                "lights.yaml",
+                "time_of_flights.yaml",
+                "traffic_signs.yaml",
+            ]
+            for fname in needed:
+                dst = os.path.join(target_dir, fname)
+                if not os.path.isfile(dst):
+                    src = template_dir / fname
+                    if os.path.isfile(src):
+                        shutil.copyfile(str(src), dst)
+                    else:
+                        # create minimal file if template missing
+                        with open(dst, "w", encoding="utf-8") as f:
+                            if fname.endswith("traffic_signs.yaml"):
+                                f.write("traffic_signs:\n")
+                            elif fname.endswith("vehicles.yaml"):
+                                f.write("vehicles:\n")
+                            else:
+                                f.write("")
+            # ensure main.yaml includes vehicles, cameras, traffic_signs
+            main_yaml_path = os.path.join(target_dir, "main.yaml")
+            if os.path.isfile(main_yaml_path):
+                with open(main_yaml_path, "r", encoding="utf-8") as f:
+                    content = f.read()
+                lines_to_add = []
+                if "vehicles: !include \"vehicles.yaml\"" not in content:
+                    lines_to_add.append("  vehicles: !include \"vehicles.yaml\"\n")
+                if "cameras: !include \"cameras.yaml\"" not in content:
+                    lines_to_add.append("  cameras: !include \"cameras.yaml\"\n")
+                if "traffic_signs: !include \"traffic_signs.yaml\"" not in content:
+                    lines_to_add.append("  traffic_signs: !include \"traffic_signs.yaml\"\n")
+                if lines_to_add:
+                    if content.endswith("\n"):
+                        content += "".join(lines_to_add)
+                    else:
+                        content += "\n" + "".join(lines_to_add)
+                    with open(main_yaml_path, "w", encoding="utf-8") as f:
+                        f.write(content)
+        except Exception as e:
+            logging.exception(f"Failed to ensure vehicle/sign runtime files in {target_dir}: {e}")
+    # ###### END DT_MAPS COMPATIBILITY ######
+
     #  Open map
     def create_map_triggered(self, info: Dict[str, Any]) -> None:
         if info["x"] == "" or info["y"] == "":
@@ -88,6 +203,7 @@ class MapAPI:
                 if os.path.exists(path):
                     shutil.rmtree(path)
                 os.makedirs(path)
+                self._ensure_map_base(str(path))
                 self._map_viewer.create_new_map(info, path)
                 self.save_map_triggered()
             except OSError as err:
@@ -127,17 +243,103 @@ class MapAPI:
 
     #  Save map
     def save_map_triggered(self) -> None:
-        self._map_storage.map.to_disk()
+        try:
+            dm = self._map_storage.map
+            save_dir = getattr(dm, "_path", None)
+            save_name = getattr(dm, "_name", None)
+            logging.info(f"Saving map to disk. name={save_name} dir={save_dir}")
+            print(f"[MapEditor] Saving map to disk. name={save_name} dir={save_dir}")
+            if save_dir:
+                self._ensure_map_base(save_dir)
+                self._ensure_vehicle_runtime_files(save_dir)
+            self._map_storage.map.to_disk()
+            # try:
+            #     self._prefix_sign_types(save_dir)
+            # except Exception as e:
+            #     logging.warning(f"Could not prefix traffic sign types: {e}")
+            # Post-process: remove redundant i/j from tiles.yaml on disk
+            try:
+                self._strip_tile_indices(save_dir)
+            except Exception as e:
+                logging.warning(f"Could not strip tile indices: {e}")
+            logging.info("Map saved successfully")
+            print("[MapEditor] Map saved successfully")
+        except Exception as e:
+            logging.exception("Failed to save map")
+            print(f"[MapEditor] Failed to save map: {e}")
 
     #  Save map as
     def save_map_as_triggered(self, parent: QtWidgets.QWidget) -> bool:
         path = self._qt_api.get_dir(parent, "save")
         self.set_move_mode(False)
         if path:
-            change_map_directory(self._map_storage.map, path)
-            self.save_map_triggered()
+            try:
+                dm = self._map_storage.map
+                old_dir = getattr(dm, "_path", None)
+                old_name = getattr(dm, "_name", None)
+                logging.info(f"Save As selected directory: {path}")
+                print(f"[MapEditor] Save As selected directory: {path}")
+                change_map_directory(dm, path)
+                new_dir = getattr(dm, "_path", None)
+                new_name = getattr(dm, "_name", None)
+                logging.info(f"Changed map directory name={new_name} old_dir={old_dir} new_dir={new_dir}")
+                print(f"[MapEditor] Changed map directory name={new_name} old_dir={old_dir} new_dir={new_dir}")
+                if new_dir:
+                    self._ensure_map_base(new_dir)
+                self.save_map_triggered()
+            except Exception as e:
+                logging.exception("Failed during Save As operation")
+                print(f"[MapEditor] Failed during Save As: {e}")
             return True
         return False
+
+    def _strip_tile_indices(self, directory: str) -> None:
+        """Remove i/j from tiles.yaml; indices are implied by tile name.
+
+        Keeps only the minimal fields (e.g., type) for each tile.
+        """
+        tiles_path = os.path.join(directory, "tiles.yaml")
+        if not os.path.isfile(tiles_path):
+            return
+        with open(tiles_path, "r", encoding="utf-8") as f:
+            data = yaml.safe_load(f) or {}
+        tiles = data.get("tiles", {})
+        if not isinstance(tiles, dict):
+            return
+        for tile_name, conf in list(tiles.items()):
+            if isinstance(conf, dict):
+                conf.pop("i", None)
+                conf.pop("j", None)
+        with open(tiles_path, "w", encoding="utf-8") as f:
+            yaml.safe_dump(data, f, sort_keys=False)
+
+    # ###### DT_MAPS COMPATIBILITY sign_* mapping for Duckiematrix ######
+    # Update traffic_signs types to sign_{type} for Duckiematrix consumption.
+    # Not needed if dt_maps accepts sign_* enum names.
+    # def _prefix_sign_types(self, directory: str) -> None:
+    #     """Update traffic_signs types to sign_{type} for Duckiematrix consumption."""
+    #     ts_path = os.path.join(directory, "traffic_signs.yaml")
+    #     if not os.path.isfile(ts_path):
+    #         return
+    #     with open(ts_path, "r", encoding="utf-8") as f:
+    #         data = yaml.safe_load(f) or {}
+    #     signs = data.get("traffic_signs", {})
+    #     if not isinstance(signs, dict):
+    #         return
+    #     updated = False
+    #     for name, conf in list(signs.items()):
+    #         if not isinstance(conf, dict):
+    #             continue
+    #         t = conf.get("type", None)
+    #         if isinstance(t, str) and not t.startswith("sign_"):
+    #             conf["type"] = f"sign_{t}"
+    #             signs[name] = conf
+    #             updated = True
+    #     if updated:
+    #         data["traffic_signs"] = signs
+    #         with open(ts_path, "w", encoding="utf-8") as f:
+    #             yaml.safe_dump(data, f, sort_keys=False)
+    # ###### END DT_MAPS COMPATIBILITY ######
 
     #  Exit
     def exit_triggered(self, _translate, window: QtWidgets.QMainWindow) -> None:

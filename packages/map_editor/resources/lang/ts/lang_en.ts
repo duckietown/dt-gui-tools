@@ -9,7 +9,7 @@
     </message>
     <message>
         <location filename="main_design.py" line="308"/>
-        <source>Map Builder</source>
+        <source>Map Editor</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

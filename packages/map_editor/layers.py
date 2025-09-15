@@ -70,19 +70,10 @@ class GroundTagsLayerHandler(BasicLayerHandler):
         kwargs["default_conf"] = {"size": 0.15, "id": 0, "family": "36h11"}
         super(GroundTagsLayerHandler, self).__init__(**kwargs)
 
-
 class CitizensLayerHandler(BasicLayerHandler):
     def __init__(self, **kwargs) -> None:
-        kwargs["default_conf"] = {"color": "yellow"}
+        kwargs["default_conf"] = {}
         super(CitizensLayerHandler, self).__init__(**kwargs)
-
-    def check_config(self, config: Dict[str, Any]) -> bool:
-        return super().check_config(config) and \
-               config.get("color") in [t.value for t in CitizenType]
-
-    def fields_with_types(self) -> list:
-        return ["color"]
-
 
 class VehiclesLayerHandler(BasicLayerHandler):
     def __init__(self, **kwargs) -> None:

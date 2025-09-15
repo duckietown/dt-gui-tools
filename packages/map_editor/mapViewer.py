@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from copy import deepcopy
+import math
 from importlib import import_module
 from PyQt5 import QtWidgets, QtGui, QtCore
 from PyQt5.QtWidgets import QApplication
@@ -25,12 +26,14 @@ from classes.layers import BasicLayerHandler, DynamicLayer
 from classes.map_objects import DraggableImage, ImageObject
 from classes.MapDescription import MapDescription
 from typing import Dict, Any, Optional, Union, Tuple, List
+import os
+import yaml
 from coordinatesTransformer import CoordinatesTransformer
 from history import Memento
 from buffer import Buffer
 from painter import Painter
 from utils.maps import default_map_storage, get_map_height, get_map_width, \
-    change_map_name, convert_layer_name_to_class_name
+    change_map_name, convert_layer_name_to_class_name, create_layer, set_obj
 from utils.constants import LAYERS_WITH_TYPES, OBJECTS_TYPES, FRAMES, FRAME, \
     TILES, TILE_MAPS, TILE_SIZE, NOT_DRAGGABLE, LAYER_NAME, NEW_CONFIG, \
     KNOWN_LAYERS, WATCHTOWERS, VEHICLES, TRAFFIC_SIGNS
@@ -70,6 +73,7 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
     grid_width: float = tile_width * grid_scale
     tile_map: str = "map_1"
     buffer: Buffer = None
+    _frame_units: Dict[str, str] = {}
 
     def __init__(self, work_dir: str) -> None:
         QtWidgets.QGraphicsView.__init__(self)
@@ -87,10 +91,40 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
                                                               self.tile_width,
                                                               self.tile_height)
         self.painter = Painter()
+        # Load units for default map
+        try:
+            self._load_frame_units(Path(f"{work_dir}/maps/empty_map"))
+        except Exception:
+            self._frame_units = {}
         self.init_all_map_objects()
+        # Ensure vehicles (if any) have valid defaults (e.g., color)
+        try:
+            self._sanitize_vehicle_defaults()
+        except Exception:
+            pass
         self.set_map_size()
         self.setMouseTracking(True)
         self.buffer = Buffer()
+
+    def _load_frame_units(self, path: Path) -> None:
+        self._frame_units = {}
+        try:
+            frames_yaml_path = os.path.join(str(path), "frames.yaml")
+            if not os.path.exists(frames_yaml_path):
+                return
+            with open(frames_yaml_path, "r") as fh:
+                data = yaml.safe_load(fh) or {}
+            frames_dict = data.get("frames", {}) if isinstance(data, dict) else {}
+            for name, conf in frames_dict.items():
+                try:
+                    unit_val = conf.get("unit", None)
+                    if isinstance(unit_val, str) and unit_val:
+                        self._frame_units[name] = unit_val
+                except Exception:
+                    continue
+        except Exception:
+            # best-effort parsing; missing or invalid YAML leaves units empty
+            self._frame_units = {}
 
     def init_all_map_objects(self) -> None:
         frames = self.get_layer("frames")
@@ -121,25 +155,8 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
                 handlers_list.append(
                     attribute(layer_name=layer_name))
             else:
-                # get unknown layer config from .yaml
-                try:
-                    keys = list(self.map.map.layers[layer_name].keys())
-                except KeyError:
-                    continue
-                conf = {}
-                if len(keys) > 0:
-                    # set default conf with empty values
-                    conf = deepcopy(self.map.map.layers[layer_name][keys[0]])
-                # create dynamic layer
-                dynamic_layer = DynamicLayer(conf=conf,
-                                             layer_name=layer_name,
-                                             map=self.map.map)
-                # register new dynamic layer in map.layers
-                REGISTER[layer_name] = dynamic_layer
-                # added basic layer handler
-                handler = BasicLayerHandler(default_conf=conf,
-                                            layer_name=layer_name)
-                handlers_list.append(handler)
+                # Skip unknown/runtime layers (e.g., renderer/lights/wheels) that the editor does not manage
+                continue
         for i in range(len(handlers_list) - 1):
             handlers_list[i].set_next(handlers_list[i + 1])
         self.handlers = handlers_list[0]
@@ -194,11 +211,120 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
         self.add_obj_image(layer_name, object_name, item_name=item_name)
         self.scaled_obj(self.get_image_object(object_name),
                         {'scale': self.scale})
+        # If a vehicle is added, create its auxiliary components in other layers
+        if layer_name == VEHICLES:
+            try:
+                self._ensure_vehicle_components(object_name)
+            except Exception:
+                # Best-effort; avoid blocking editor on auxiliary creation
+                pass
+
+    def _ensure_layer(self, layer_name: str) -> None:
+        # Create layer in the underlying Map if missing
+        dm = self.map.map
+        if not hasattr(dm.layers, layer_name):
+            try:
+                create_layer(dm, layer_name, {})
+            except Exception:
+                pass
+
+    def _ensure_vehicle_components(self, vehicle_name: str) -> None:
+        dm = self.map.map
+        # Wheels
+        self._ensure_layer("wheels")
+        wheels_conf = {
+            f"{vehicle_name}/wheel_left": {"encoder": {"resolution": 135}, "radius": 0.0318},
+            f"{vehicle_name}/wheel_right": {"encoder": {"resolution": 135}, "radius": 0.0318},
+        }
+        for full_name, conf in wheels_conf.items():
+            try:
+                set_obj(dm.layers["wheels"], full_name, conf)
+            except Exception:
+                pass
+        # Vehicle dynamics
+        self._ensure_layer("vehicle_dynamics")
+        dynamics_conf = {
+            vehicle_name: {"commands_delay": 0.0, "motor_constant_left": 27.0, "motor_constant_right": 27.0}
+        }
+        for full_name, conf in dynamics_conf.items():
+            try:
+                set_obj(dm.layers["vehicle_dynamics"], full_name, conf)
+            except Exception:
+                pass
+        # Time of flights
+        self._ensure_layer("time_of_flights")
+        tof_conf = {
+            f"{vehicle_name}/tof_front_center": {"angle": 0.4363, "frequency": 15, "maximum_distance": 1.2, "name": "front_center"}
+        }
+        for full_name, conf in tof_conf.items():
+            try:
+                set_obj(dm.layers["time_of_flights"], full_name, conf)
+            except Exception:
+                pass
+        # Vehicle tags
+        self._ensure_layer("vehicle_tags")
+        tags_conf = {
+            f"{vehicle_name}/tag": {"family": "36h11", "id": 403, "name": "top", "size": 0.08}
+        }
+        for full_name, conf in tags_conf.items():
+            try:
+                set_obj(dm.layers["vehicle_tags"], full_name, conf)
+            except Exception:
+                pass
+        # Lights
+        self._ensure_layer("lights")
+        lights_conf = {
+            f"{vehicle_name}/light_0": {"angle": 0.0, "color": "#ffffff", "intensity": 0.6, "name": "front_left", "range": 2.0, "type": "spot"},
+            f"{vehicle_name}/light_1": {"angle": 0.0, "color": "#ffffff", "intensity": 0.6, "name": "front_right", "range": 2.0, "type": "spot"},
+            f"{vehicle_name}/light_2": {"angle": 0.0, "color": "#f00000", "intensity": 0.6, "name": "back_left", "range": 2.0, "type": "spot"},
+            f"{vehicle_name}/light_3": {"angle": 0.0, "color": "#f00000", "intensity": 0.6, "name": "back_right", "range": 2.0, "type": "spot"},
+        }
+        for full_name, conf in lights_conf.items():
+            try:
+                set_obj(dm.layers["lights"], full_name, conf)
+            except Exception:
+                pass
+        # Cameras (use default intrinsic parameters from template)
+        self._ensure_layer("cameras")
+        camera_conf = {
+            f"{vehicle_name}/camera_0": {
+                "camera_matrix": [[294.53932068591484, 0.0, 309.40712721751646], [0.0, 296.5367154664796, 228.72814869651435], [0.0, 0.0, 1.0]],
+                "distortion_parameters": [-0.22642034632167934, 0.032424830545866784, -0.0030997885368560392, 0.00026050478624311846, 0.0],
+                "frame_rate": 30, "height": 480, "name": "front_center", "width": 640
+            }
+        }
+        for full_name, conf in camera_conf.items():
+            try:
+                set_obj(dm.layers["cameras"], full_name, conf)
+            except Exception:
+                pass
+        # Renderer assignments: ensure vehicle is rendered
+        try:
+            self._ensure_layer("renderer_assignments")
+            ra_layer = dm.layers["renderer_assignments"]
+            # simple structure: renderer_0.entities: [...]
+            if "renderer_0" not in ra_layer:
+                set_obj(ra_layer, "renderer_0", {"entities": []})
+            try:
+                entities = ra_layer["renderer_0"]["entities"]
+            except Exception:
+                entities = []
+            if vehicle_name not in entities:
+                entities.append(vehicle_name)
+                set_obj(ra_layer, "renderer_0", {"entities": entities})
+        except Exception:
+            pass
 
     def generate_object_name_and_id(self, map_name: str, layer_name: str) -> Tuple[str, int]:
         i = 1
         while True:
-            object_name: str = f"{map_name}/{layer_name[:-1]}{i}"
+            # Standardize naming to singular + _{i} for non-tiles.
+            # Special case: citizens should be named 'duckie_{i}' in the matrix.
+            if layer_name == 'citizens':
+                singular = 'duckie'
+            else:
+                singular = layer_name[:-1]
+            object_name = f"{map_name}/{singular}_{i}"
             if object_name not in self.objects:
                 break
             i += 1
@@ -227,10 +353,19 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
                                      object_name, layer_name)
         if new_obj:
             frame_obj = self.get_frame_object(object_name)
-            self.rotate_obj(new_obj, frame_obj.pose.yaw)
+            # Map stores yaw in radians; viewer uses degrees
+            # Invert display rotation: show opposite of stored yaw
+            self.rotate_obj(new_obj, -math.degrees(frame_obj.pose.yaw))
             coordinates = self.get_final_pos(object_name,
                                                  frame_obj.pose.x,
                                                  frame_obj.pose.y)
+            # For non-tile objects (e.g., vehicles/signs), shift by half-tile so (0,0)
+            # corresponds to tile center in the Duckiematrix convention
+            if new_obj.layer_name != TILES:
+                coordinates = (
+                    coordinates[0] - (self.tile_width / 2.0),
+                    coordinates[1] - (self.tile_height / 2.0),
+                )
             view_coordinates = (
                 self.get_x_to_view(coordinates[0], new_obj.width()),
                 self.get_y_to_view(coordinates[1]), new_obj.height()
@@ -244,13 +379,88 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
         self.change_object_handler(self.scaled_obj, {"scale": self.scale})
 
     def get_final_pos(self, frame_name: str, x: float, y: float) -> Tuple[float, float]:
+        def _extract_pose_and_unit(obj) -> Tuple[float, float, Optional[str]]:
+            unit_value = None
+            px = 0.0
+            py = 0.0
+            # typed object path
+            try:
+                unit_value = getattr(obj, "unit", None)
+            except Exception:
+                unit_value = None
+            try:
+                px = obj.pose.x
+                py = obj.pose.y
+                # override from file-based cache when available
+                try:
+                    cached_unit = self._frame_units.get(frame_name)
+                    if cached_unit is not None:
+                        unit_value = cached_unit
+                except Exception:
+                    pass
+                return px, py, unit_value
+            except Exception:
+                pass
+            # dict path
+            try:
+                unit_value = obj.get("unit", unit_value)
+                pose = obj.get("pose", {})
+                px = pose.get("x", 0.0)
+                py = pose.get("y", 0.0)
+            except Exception:
+                px, py = 0.0, 0.0
+            # override from file-based cache when available
+            try:
+                cached_unit = self._frame_units.get(frame_name)
+                if cached_unit is not None:
+                    unit_value = cached_unit
+            except Exception:
+                pass
+            return px, py, unit_value
+
+        def _scale_xy_by_unit(px: float, py: float, unit_value: Optional[str]) -> Tuple[float, float]:
+            if isinstance(unit_value, str) and unit_value.lower() == "tiles":
+                return px * self.tile_width, py * self.tile_height
+            return px, py
+
         frames = self.get_layer("frames")
-        frame_obj = frames[frame_name]
-        while frame_obj.relative_to != self.tile_map:
-            frame_obj = frames[frame_obj.relative_to]
-            x += frame_obj.pose.x
-            y += frame_obj.pose.y
-        return x, y
+        # start from this frame's pose, respecting its unit
+        try:
+            start_obj = frames[frame_name]
+        except Exception:
+            start_obj = None
+        if start_obj is not None:
+            sx, sy, sunit = _extract_pose_and_unit(start_obj)
+            # Only scale when unit explicitly equals 'tiles'. Otherwise, use values as-is.
+            x_total, y_total = _scale_xy_by_unit(sx, sy, sunit)
+        else:
+            x_total, y_total = x, y
+        # Walk up the frame tree safely until we reach the map root
+        frame_obj = start_obj
+        while frame_obj is not None:
+            parent = None
+            try:
+                parent = getattr(frame_obj, "relative_to", None)
+            except Exception:
+                pass
+            if parent is None:
+                try:
+                    parent = frame_obj.get("relative_to", None)
+                except Exception:
+                    parent = None
+            # stop if parent is missing/empty or already at map root
+            if not parent or parent == self.tile_map:
+                break
+            # try to climb one level; stop if parent not found
+            try:
+                frame_obj = frames[parent]
+            except Exception:
+                break
+            px, py, punit = _extract_pose_and_unit(frame_obj)
+            px, py = _scale_xy_by_unit(px, py, punit)
+            x_total += px
+            y_total += py
+        return x_total, y_total
 
     def get_relative_map_pos(self, frame_name: str,
                              new_qt_pos: Tuple[float, float],
@@ -371,7 +581,7 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
         self.scene_update()
 
     def rotate_obj_on_map(self, frame_name: str, new_angle: float) -> None:
-        self.handlers.handle(command=RotateCommand(frame_name, new_angle))
+        self.handlers.handle(command=RotateCommand(frame_name, math.radians(new_angle)))
 
     def scaled_obj(self, obj: ImageObject, args: Dict[str, Any]) -> None:
         scale = args["scale"]
@@ -381,6 +591,12 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
         frame_obj_coord = self.get_frame_object(obj.name)["pose"]
         view_coord = self.get_final_pos(obj.name, frame_obj_coord["x"],
                                         frame_obj_coord["y"])
+        # Align non-tile objects to Duckiematrix tile-center convention
+        if obj.layer_name != TILES:
+            view_coord = (
+                view_coord[0] + (self.tile_width / 2.0),
+                view_coord[1] + (self.tile_height / 2.0),
+            )
         new_coordinates = (
             self.get_x_to_view(
                 view_coord[0], obj_width) + self.offset_x,
@@ -399,11 +615,31 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
     def rotate_with_button(self, args: Dict[str, Any]) -> None:
         tile_name = args["tile_name"]
         obj = self.get_image_object(tile_name)
-        self.rotate_obj(obj, obj.yaw + 90)
-        self.rotate_obj_on_map(tile_name, obj.yaw)
+        # Invert visual rotation: rotate sprite opposite to saved yaw
+        new_angle = obj.yaw + 90
+        self.rotate_obj(obj, new_angle)
+        self.rotate_obj_on_map(tile_name, new_angle)
 
-    def is_selected_tile(self, tile: Tile, is_dict: bool = False) -> bool:
-        tile_i, tile_j = (tile["i"], tile["j"]) if is_dict else (tile.i, tile.j)
+    def is_selected_tile(self, tile: Tile, is_dict: bool = False, tile_name: Optional[str] = None) -> bool:
+        try:
+            tile_i, tile_j = (tile["i"], tile["j"]) if is_dict else (tile.i, tile.j)
+        except Exception:
+            # derive indices from name pattern .../tile_i_j when fields are missing
+            tile_i, tile_j = None, None
+            if tile_name is None:
+                # try to find name by reverse lookup from objects dict
+                for name, obj in self.objects.items():
+                    if obj.layer_name == TILES and self.get_image_object(name) is not None and obj == self.get_image_object(name):
+                        tile_name = name
+                        break
+            if tile_name:
+                import re
+                m = re.search(r"/tile_(\d+)_(\d+)$", tile_name)
+                if m:
+                    tile_i = int(m.group(1))
+                    tile_j = int(m.group(2))
+            if tile_i is None or tile_j is None:
+                return False
         return ((tile_i + 1) * self.tile_width >= self.tile_selection[0] and
                 tile_i * self.tile_width <= self.tile_selection[2] and
                 (tile_j + 1) * self.tile_height >= self.tile_selection[3] and
@@ -445,9 +681,23 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
             default_layer_conf = {}
         for key in default_layer_conf:
             try:
+                # prefer typed value when available
                 default_layer_conf[key] = obj[key].value
-            except AttributeError:
-                default_layer_conf[key] = obj[key]
+            except Exception:
+                # fallback to raw value when present
+                try:
+                    default_layer_conf[key] = obj[key]
+                except Exception:
+                    # final fallback for tiles missing i/j: derive from name
+                    if layer_name == TILES and key in ("i", "j"):
+                        import re
+                        m = re.search(r"/tile_(\d+)_(\d+)$", name)
+                        if m:
+                            default_layer_conf["i"] = int(m.group(1))
+                            default_layer_conf["j"] = int(m.group(2))
+                            continue
+                    # leave unset if not derivable
+                    pass
         return default_layer_conf
 
     def change_obj_info(self, layer_name: str, obj_name: str) -> None:
@@ -503,6 +753,13 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
                     obj.delete_object()
                     layer = self.get_layer(conf[LAYER_NAME])
                     self.add_obj_image(conf[LAYER_NAME], conf["name"], layer[conf["name"]])
+                    # Recenter to keep view consistent after edits
+                    try:
+                        self.parentWidget().parent().to_the_map_corner()
+                        self.set_offset()
+                        self.scene_update()
+                    except Exception:
+                        pass
                 else:
                     self.parentWidget().parent().view_info_form("Error",
                                                                 "Invalid object configuration entered!")
@@ -542,7 +799,7 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
         tiles = self.get_layer(TILES)
         for tile_name in tiles:
             tile = tiles[tile_name]
-            if self.is_selected_tile(tile):
+            if self.is_selected_tile(tile, tile_name=tile_name):
                 args["tile_name"] = tile_name
                 args["tile"] = tile
                 handler_func(args)
@@ -561,9 +818,10 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
     def rotate_object_with_button(self, obj: ImageObject,
                                   args: Dict[str, Any]) -> None:
         if obj.is_draggable() and obj.is_select:
-            new_angle = obj.yaw + 90
+            new_angle = obj.yaw - 90
             self.rotate_obj(obj, new_angle)
             self.rotate_obj_on_map(obj.name, new_angle)
+            self.scene_update()
 
     def rotate_objects(self) -> None:
         self.change_object_handler(self.rotate_object_with_button, {})
@@ -584,6 +842,13 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
         self.handlers.handle(command=ChangeTypeCommand(TILES, tile_name,
                                                        new_tile_type))
         self.rotate_obj_on_map(tile_name, 0)
+        # Recenter view after tile change to avoid drifting offsets
+        try:
+            self.parentWidget().parent().to_the_map_corner()
+            self.set_offset()
+            self.scene_update()
+        except Exception:
+            pass
 
     def wheelEvent(self, event: QtGui.QWheelEvent) -> None:
         sf = 1.5 ** (event.angleDelta().y() / 240)
@@ -823,6 +1088,11 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
         self.parentWidget().parent().clear_editor_history()
         self.map.load_map(MapDescription(path, map_name))
         self.init_handlers()
+        # refresh frame units from the just-opened map directory
+        try:
+            self._load_frame_units(path)
+        except Exception:
+            self._frame_units = {}
         if is_new_map:
             self.create_default_map_content(size, tile_size, default_fill)
         else:
@@ -905,7 +1175,7 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
         selected_tiles = []
         for tile_name in tiles:
             tile = tiles[tile_name]
-            if self.is_selected_tile(tile):
+            if self.is_selected_tile(tile, tile_name=tile_name):
                 selected_tiles.append(tile)
         return selected_tiles
 
@@ -990,3 +1260,36 @@ class MapViewer(QtWidgets.QGraphicsView, QtWidgets.QWidget):
         self.painting_tiles("asphalt")
         # delete selected_objects
         self.delete_selected_objects()
+
+    def _sanitize_vehicle_defaults(self) -> None:
+        """If vehicles exist, ensure their color is valid; default to 'blue' when None.
+
+        Does not create vehicles; only fixes invalid ones to prevent dt_maps enum errors.
+        """
+        try:
+            vehicles_layer = None
+            try:
+                vehicles_layer = self.get_layer(VEHICLES)
+            except Exception:
+                vehicles_layer = None
+            if not vehicles_layer:
+                return
+            for v_name, vehicle in list(vehicles_layer.items()):
+                current_color = getattr(vehicle, "color", None)
+                if current_color is None:
+                    success = False
+                    try:
+                        setattr(vehicle, "color", "blue")
+                        # re-check
+                        success = getattr(vehicle, "color", None) is not None
+                    except Exception:
+                        success = False
+                    if not success:
+                        try:
+                            # remove invalid vehicle to avoid crashes
+                            del vehicles_layer[v_name]
+                        except Exception:
+                            pass
+        except Exception:
+            # best-effort sanitation; ignore failures
+            pass

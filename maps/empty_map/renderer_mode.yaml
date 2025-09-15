@@ -1,0 +1,3 @@
+renderer_mode:
+  '*':
+    interactive: true
