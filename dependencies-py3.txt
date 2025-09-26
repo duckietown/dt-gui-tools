@@ -1,7 +1,6 @@
 # LIST YOUR PYTHON3 PACKAGES HERE
 
 # Map editor
-PyQt5==5.14.1
 pynput==1.7.1
 git+https://github.com/OSLL/lib-dt-maps.git@ente
 
