@@ -8,16 +8,16 @@ ARG PROJECT_FORMAT_VERSION
 
 # ==================================================>
 # ==> Do not change the code below this line
-ARG ARCH
-ARG DISTRO
-ARG DOCKER_REGISTRY
-ARG BASE_REPOSITORY
+ARG ARCH=arm64v8
+ARG DISTRO=ente
+ARG DOCKER_REGISTRY=docker.io
+ARG BASE_REPOSITORY=dt-core
 ARG BASE_ORGANIZATION=duckietown
 ARG BASE_TAG=${DISTRO}-${ARCH}
 ARG LAUNCHER=default
 
 # define base image
-FROM ${DOCKER_REGISTRY}/${BASE_ORGANIZATION}/${BASE_REPOSITORY}:${BASE_TAG} as base
+FROM ${DOCKER_REGISTRY}/${BASE_ORGANIZATION}/${BASE_REPOSITORY}:${BASE_TAG} AS base
 
 # novnc and websockify versions to use
 ARG NOVNC_VERSION="9fe2fd0"
@@ -139,12 +139,23 @@ COPY assets/vnc/image /
 
 #### => Substep: Frontend builder
 ##
-##  NOTE:   This substep always runs in an amd64 image regardless of the architecture of
-##          the final image. As a result, this Dockerfile can be run only on amd64 machines
-##          with QEMU enabled.
+##  NOTE:   This substep now respects the target architecture and will use the appropriate
+##          base image for the platform being built based on the ARCH argument.
 ##
 ##
-FROM ubuntu:focal as builder
+# Use architecture-aware base image based on ARCH argument
+ARG ARCH
+ARG NOVNC_VERSION
+ARG WEBSOCKIFY_VERSION
+
+# Map ARCH to Docker platform format and use appropriate base image
+# ARCH 'amd64' -> 'linux/amd64', ARCH 'arm64v8' -> 'linux/arm64'
+FROM --platform=linux/amd64 ubuntu:focal AS base-amd64
+FROM --platform=linux/arm64 ubuntu:focal AS base-arm64v8
+
+# Select the appropriate base based on ARCH argument
+ARG ARCH=arm64v8
+FROM base-${ARCH} AS builder
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
@@ -166,12 +177,10 @@ RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
     && apt-get install -y yarn
 
 # fetch noVNC
-ARG NOVNC_VERSION
 RUN git clone https://github.com/novnc/noVNC /src/web/static/novnc \
     && git -C /src/web/static/novnc checkout ${NOVNC_VERSION}
 
 # fetch websockify
-ARG WEBSOCKIFY_VERSION
 RUN git clone https://github.com/novnc/websockify /src/web/static/websockify \
     && git -C /src/web/static/websockify checkout ${WEBSOCKIFY_VERSION}
 
@@ -196,7 +205,7 @@ RUN ln -sf /usr/local/lib/web/frontend/static/websockify \
     && chmod +x /usr/local/lib/web/frontend/static/websockify/run
 
 # configure novnc
-ENV HTTP_PORT 8087
+ENV HTTP_PORT=8087
 
 # get the image_pipeline (this is needed to avoid issues with python2 shebang)
 RUN git clone https://github.com/ros-perception/image_pipeline.git --branch noetic
