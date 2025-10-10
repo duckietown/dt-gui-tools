@@ -139,12 +139,22 @@ COPY assets/vnc/image /
 
 #### => Substep: Frontend builder
 ##
-##  NOTE:   This substep always runs in an amd64 image regardless of the architecture of
-##          the final image. As a result, this Dockerfile can be run only on amd64 machines
-##          with QEMU enabled.
+##  NOTE:   This substep now respects the target architecture and will use the appropriate
+##          base image for the platform being built based on the ARCH argument.
 ##
 ##
-FROM ubuntu:focal as builder
+# Use architecture-aware base image based on ARCH argument
+ARG ARCH
+ARG NOVNC_VERSION
+ARG WEBSOCKIFY_VERSION
+
+# Map ARCH to Docker platform format and use appropriate base image
+# ARCH 'amd64' -> 'linux/amd64', ARCH 'arm64v8' -> 'linux/arm64'
+FROM --platform=linux/amd64 ubuntu:focal as base-amd64
+FROM --platform=linux/arm64 ubuntu:focal as base-arm64v8
+
+# Select the appropriate base based on ARCH argument
+FROM base-${ARCH} as builder
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
@@ -166,12 +176,10 @@ RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
     && apt-get install -y yarn
 
 # fetch noVNC
-ARG NOVNC_VERSION
 RUN git clone https://github.com/novnc/noVNC /src/web/static/novnc \
     && git -C /src/web/static/novnc checkout ${NOVNC_VERSION}
 
 # fetch websockify
-ARG WEBSOCKIFY_VERSION
 RUN git clone https://github.com/novnc/websockify /src/web/static/websockify \
     && git -C /src/web/static/websockify checkout ${WEBSOCKIFY_VERSION}
 
