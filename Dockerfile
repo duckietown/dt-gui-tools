@@ -144,9 +144,6 @@ COPY assets/vnc/image /
 ##
 ##
 # Use architecture-aware base image based on ARCH argument
-ARG ARCH
-ARG NOVNC_VERSION
-ARG WEBSOCKIFY_VERSION
 
 # Map ARCH to Docker platform format and use appropriate base image
 # ARCH 'amd64' -> 'linux/amd64', ARCH 'arm64v8' -> 'linux/arm64'
