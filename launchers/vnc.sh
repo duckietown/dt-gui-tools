@@ -41,6 +41,8 @@ if [ -n "${RESOLUTION-}" ]; then
     sed -i "s/1024x768/$RESOLUTION/" /usr/local/bin/xvfb.sh
 fi
 
+echo "Line 44"
+
 USER=${USER:-root}
 if [ "$USER" != "root" ]; then
     echo "* enable custom user: $USER"
@@ -59,9 +61,13 @@ sed -i -e "s|%USER%|$USER|" -e "s|%HOME%|$HOME|" /etc/supervisor/conf.d/supervis
 
 # home folder
 if [ ! -x "$HOME/.config/pcmanfm/LXDE/" ]; then
-    mkdir -p $HOME/.config/pcmanfm/LXDE/
-    ln -sf /usr/local/share/wallpapers/desktop-items-0.conf $HOME/.config/pcmanfm/LXDE/
-    chown -R $USER:$USER $HOME
+    mkdir -p "$HOME/.config/pcmanfm/LXDE/"
+    ln -sf /usr/local/share/wallpapers/desktop-items-0.conf "$HOME/.config/pcmanfm/LXDE/"
+
+    # avoid heavy chown when running as root
+    if [ "$USER" != "root" ]; then
+        chown -R "$USER:$USER" "$HOME"
+    fi
 fi
 
 # nginx workers

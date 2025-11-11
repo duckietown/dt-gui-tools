@@ -25,6 +25,7 @@ server {
 	location / {
 		rewrite /approot/(.*) /$1 break;
 		root /usr/local/lib/web/frontend/;
+		try_files $uri $uri/ /index.html;
 	}
 
 	location @apiwebsocket {

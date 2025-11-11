@@ -144,9 +144,6 @@ COPY assets/vnc/image /
 ##
 ##
 # Use architecture-aware base image based on ARCH argument
-ARG ARCH
-ARG NOVNC_VERSION
-ARG WEBSOCKIFY_VERSION
 
 # Map ARCH to Docker platform format and use appropriate base image
 # ARCH 'amd64' -> 'linux/amd64', ARCH 'arm64v8' -> 'linux/arm64'
@@ -207,13 +204,5 @@ RUN ln -sf /usr/local/lib/web/frontend/static/websockify \
 # configure novnc
 ENV HTTP_PORT=8087
 
-# get the image_pipeline (this is needed to avoid issues with python2 shebang)
-RUN git clone https://github.com/ros-perception/image_pipeline.git --branch noetic
-
 # uninstall opencv-python-headless as it obscures opencv-python
 RUN pip3 uninstall --yes opencv-python-headless
-
-# build packages
-RUN . /opt/ros/${ROS_DISTRO}/setup.sh && \
-  catkin build \
-    --workspace ${CATKIN_WS_DIR}/
