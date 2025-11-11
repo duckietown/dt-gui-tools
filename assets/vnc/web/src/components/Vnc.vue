@@ -144,7 +144,7 @@ export default {
         if (!port) {
           port = window.location.protocol[4] === 's' ? 443 : 80
         }
-        let url = 'static/vnc.html?'
+        let url = 'static/novnc/vnc.html?'
         url += 'autoconnect=1&'
         url += `host=${hostname}&port=${port}&`
         url += `path=${websockifyPath}&title=novnc2&`
