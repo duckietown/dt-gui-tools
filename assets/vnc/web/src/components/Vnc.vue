@@ -70,17 +70,17 @@ export default {
         this.stateID = body.data.id
 
         // adaptive resolution
-        if (!body.data.config.fixedResolution && body.data.config.sizeChangedCount === 0) {
-          const response = await this.$http.get('api/reset', {params: params})
-          const body = response.data
-          if (body.code !== 200) {
-            this.stateErrorCount += 1
-            if (this.stateErrorCount > 10) {
-              this.errorMessage = this.$t('serviceIsUnavailable')
-              throw this.errorMessage
-            }
-          }
-        }
+        //if (!body.data.config.fixedResolution && body.data.config.sizeChangedCount === 0) {
+        //  const response = await this.$http.get('api/reset', {params: params})
+        //  const body = response.data
+        //  if (body.code !== 200) {
+        //    this.stateErrorCount += 1
+        //    if (this.stateErrorCount > 10) {
+        //      this.errorMessage = this.$t('serviceIsUnavailable')
+        //      throw this.errorMessage
+        //    }
+        //  }
+        //}
 
         if (this.vncState === 'stopped') {
           this.reconnect(false)
