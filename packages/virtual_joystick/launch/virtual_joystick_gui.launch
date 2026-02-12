@@ -8,6 +8,8 @@
         <remap from="$(arg node_name)/joy" to="joy" />
         <remap from="$(arg node_name)/intersection_go" to="coordinator_node/intersection_go" />
         <remap from="$(arg node_name)/emergency_stop" to="wheels_driver_node/emergency_stop" />
-        <node pkg="$(arg pkg_name)" type="$(arg node_name)_gui.py" name="$(arg node_name)" output="screen" args="$(arg veh)" />
+        <node pkg="$(arg pkg_name)" type="$(arg node_name)_gui.py" name="$(arg node_name)" output="screen" args="$(arg veh)">
+            <env name="QT_QPA_PLATFORM" value="xcb" />
+        </node>
     </group>
 </launch>
