@@ -139,20 +139,14 @@ COPY assets/vnc/image /
 
 #### => Substep: Frontend builder
 ##
-##  NOTE:   This substep now respects the target architecture and will use the appropriate
-##          base image for the platform being built based on the ARCH argument.
+##  NOTE:   This substep produces architecture-independent static web assets
+##          (noVNC frontend), so it always builds on the native build platform
+##          ($BUILDPLATFORM) to avoid cross-arch emulation (qemu/binfmt), which
+##          may not be available on all CI nodes. The resulting dist/ is copied
+##          into the target-arch final image below.
 ##
 ##
-# Use architecture-aware base image based on ARCH argument
-
-# Map ARCH to Docker platform format and use appropriate base image
-# ARCH 'amd64' -> 'linux/amd64', ARCH 'arm64v8' -> 'linux/arm64'
-FROM --platform=linux/amd64 ubuntu:focal AS base-amd64
-FROM --platform=linux/arm64 ubuntu:focal AS base-arm64v8
-
-# Select the appropriate base based on ARCH argument
-ARG ARCH=arm64v8
-FROM base-${ARCH} AS builder
+FROM --platform=$BUILDPLATFORM ubuntu:focal AS builder
 
 # re-declare version args (ARGs do not cross stage boundaries)
 ARG NOVNC_VERSION="9fe2fd0"
