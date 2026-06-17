@@ -154,6 +154,10 @@ FROM --platform=linux/arm64 ubuntu:focal AS base-arm64v8
 ARG ARCH=arm64v8
 FROM base-${ARCH} AS builder
 
+# re-declare version args (ARGs do not cross stage boundaries)
+ARG NOVNC_VERSION="9fe2fd0"
+ARG WEBSOCKIFY_VERSION="3646575"
+
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         curl \
@@ -163,23 +167,22 @@ RUN apt-get update \
         patch
 
 # nodejs
-RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - \
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
     && apt-get install -y \
         nodejs
 
-# yarn
-RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
-    && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
-    && apt-get update \
-    && apt-get install -y yarn
+# yarn (installed via npm to avoid the yarn apt repo)
+RUN npm install -g yarn
 
 # fetch noVNC
-RUN git clone https://github.com/novnc/noVNC /src/web/static/novnc \
-    && git -C /src/web/static/novnc checkout ${NOVNC_VERSION}
+RUN mkdir -p /src/web/static/novnc \
+    && curl -fsSL https://github.com/novnc/noVNC/archive/${NOVNC_VERSION}.tar.gz \
+       | tar -xz --strip-components=1 -C /src/web/static/novnc
 
 # fetch websockify
-RUN git clone https://github.com/novnc/websockify /src/web/static/websockify \
-    && git -C /src/web/static/websockify checkout ${WEBSOCKIFY_VERSION}
+RUN mkdir -p /src/web/static/websockify \
+    && curl -fsSL https://github.com/novnc/websockify/archive/${WEBSOCKIFY_VERSION}.tar.gz \
+       | tar -xz --strip-components=1 -C /src/web/static/websockify
 
 # build frontend
 COPY assets/vnc/web /src/web
