@@ -32,6 +32,11 @@ ARG BASE_TAG
 ARG BASE_IMAGE
 ARG LAUNCHER
 
+# Daffy's container-ID helper assumes cgroup v1 and crashes on cgroup v2 hosts
+# (for example, Ubuntu 22.04) when /proc/1/cpuset is unavailable. It is a no-op
+# in supported newer distributions, so disable the obsolete inherited helper.
+RUN : > /usr/local/bin/dt-get-container-id
+
 # check build arguments
 RUN dt-build-env-check "${REPO_NAME}" "${MAINTAINER}" "${DESCRIPTION}"
 
